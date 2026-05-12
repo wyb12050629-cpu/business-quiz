@@ -11,13 +11,16 @@ export default function ResultPage() {
   const router = useRouter();
   const { todayStatus, progress, streak, totalPoints, sessionPoints, score } = useGameState();
 
+  // progress === null → 아직 Firestore 로딩 중. 로딩 완료 후에만 리다이렉트 판단
   useEffect(() => {
+    if (progress === null) return; // 로딩 대기
     if (todayStatus === "not_started" || todayStatus === "in_progress") {
       router.replace("/");
     }
-  }, [todayStatus, router]);
+  }, [todayStatus, progress, router]);
 
-  if (todayStatus === "not_started" || todayStatus === "in_progress") {
+  // 로딩 중이거나 아직 완료 안 된 상태면 스피너
+  if (progress === null || todayStatus === "not_started" || todayStatus === "in_progress") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
@@ -66,11 +69,15 @@ export default function ResultPage() {
         <h1 className="text-2xl font-bold mb-2 text-gray-900">
           {isSuccess ? "퀴즈 완료!" : "오늘은 여기까지!"}
         </h1>
-        <p className="text-sm text-gray-400">
-          {isSuccess
-            ? "모든 문제를 풀었어요. 대단해요!"
-            : `${progress?.failedAtStep ?? "?"}번 문제에서 오늘 도전이 끝났어요`}
-        </p>
+        {isSuccess ? (
+          <p className="text-base font-semibold text-blue-500">
+            오늘 총 {sessionPoints}스탬프 지급!
+          </p>
+        ) : (
+          <p className="text-sm text-gray-400">
+            {progress.failedAtStep ?? "?"}번 문제에서 오늘 도전이 끝났어요
+          </p>
+        )}
       </div>
 
       {/* 점수 카드 */}
@@ -131,7 +138,7 @@ export default function ResultPage() {
           className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
         >
           <span>🔗</span>
-          <span>친구에게 공유하기</span>
+          <span>친구에게 공유하고 5스탬프 받기</span>
         </button>
         <button
           onClick={() => router.push("/points")}
