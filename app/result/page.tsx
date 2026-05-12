@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
-import { showShareReward } from "@/lib/toss-sdk";
 import { getRankByCoins } from "@/lib/ranks";
 
 export default function ResultPage() {
@@ -125,20 +124,6 @@ export default function ResultPage() {
   const prevRank = getRankByCoins(prevCoins);
   const isRankUp = isSuccess && currentRank.title !== prevRank.title;
 
-  function handleShare() {
-    showShareReward(
-      ({ rewardAmount, rewardUnit }) => {
-        console.log(`결과 공유 완료 — 리워드: ${rewardAmount}${rewardUnit}`);
-      },
-      (reason, sentCount) => {
-        console.log(`공유 모듈 종료: ${reason}, 공유 수: ${sentCount}`);
-      },
-      (error) => {
-        console.error("공유 오류:", error);
-      }
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen px-5 pt-14 pb-10">
       {/* 직급 승진 배너 */}
@@ -222,13 +207,6 @@ export default function ResultPage() {
 
       {/* 버튼 */}
       <div className="mt-auto space-y-3">
-        <button
-          onClick={handleShare}
-          className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
-        >
-          <span>🔗</span>
-          <span>친구에게 공유하고 5스탬프 받기</span>
-        </button>
         <button
           onClick={() => router.push("/points")}
           className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
