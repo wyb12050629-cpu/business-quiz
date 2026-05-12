@@ -25,13 +25,19 @@ async function getTossUserId(): Promise<string | null> {
   );
 
   const keyPromise = import("@apps-in-toss/web-framework")
-    .then((sdk) =>
-      MINI_APP_CATEGORY === "game"
+    .then(async (sdk) => {
+      // 실제 패키지 반환 타입: string | GetAnonymousKeySuccessResponse | "INVALID_CATEGORY" | "ERROR" | undefined
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response: any = await (MINI_APP_CATEGORY === "game"
         ? sdk.getUserKeyForGame()
-        : sdk.getAnonymousKey()
-    )
-    .then((key) => key ?? null)
-    .catch(() => null);
+        : sdk.getAnonymousKey());
+
+      if (!response || response === "INVALID_CATEGORY" || response === "ERROR") return null;
+      if (typeof response === "string") return response;
+      // GetAnonymousKeySuccessResponse 객체인 경우 key 필드 추출
+      return (response as Record<string, string>)?.key ?? null;
+    })
+    .catch((): null => null);
 
   return Promise.race([keyPromise, timeout]);
 }
