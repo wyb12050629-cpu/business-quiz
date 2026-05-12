@@ -172,6 +172,19 @@ export function useGameState() {
     });
   }, []);
 
+  // ── Firestore 상태 강제 새로고침 ────────────────────
+  const refresh = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const prog = await getDailyProgress(userId);
+      setProgress(prog);
+      const pts = await getUserPoints(userId);
+      if (pts) setUserPoints(pts);
+    } catch (err) {
+      console.error("[useGameState] refresh 실패:", err);
+    }
+  }, [userId]);
+
   // ── 보너스 스탬프 지급 (광고 시청 리워드 등) ────────
   const addBonusStamps = useCallback(async (amount: number) => {
     if (!userId) return;
@@ -229,5 +242,6 @@ export function useGameState() {
     handleFailure,
     addBonusStamps,
     advanceStep,
+    refresh,
   };
 }

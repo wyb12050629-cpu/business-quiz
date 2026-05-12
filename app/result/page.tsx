@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
@@ -9,11 +9,12 @@ import { getRankByCoins } from "@/lib/ranks";
 
 export default function ResultPage() {
   const router = useRouter();
-  const { todayStatus, progress, streak, totalPoints, sessionPoints, score } = useGameState();
+  const { todayStatus, progress, streak, totalPoints, sessionPoints, score, refresh } = useGameState();
+  const refreshCountRef = useRef(0);
 
   // progress 로드 완료 후 상태 판단
   // - not_started: 오늘 퀴즈 안 함 → 홈으로
-  // - in_progress: 결과 저장 중일 수 있음 → 스피너 유지 (리다이렉트 안함)
+  // - in_progress: Firestore 저장 미완료 → 최대 5번 폴링 후 강제 이동
   // - success/failure: 결과 페이지 표시
   useEffect(() => {
     if (progress === null) return; // 아직 로딩 중
@@ -21,6 +22,24 @@ export default function ResultPage() {
       router.replace("/");
     }
   }, [todayStatus, progress, router]);
+
+  // in_progress 폴링: 1.5초마다 Firestore 재조회 (최대 5회)
+  useEffect(() => {
+    if (progress === null || todayStatus !== "in_progress") {
+      refreshCountRef.current = 0;
+      return;
+    }
+    if (refreshCountRef.current >= 5) {
+      // 5번 시도 후에도 in_progress → 강제로 홈 이동
+      router.replace("/");
+      return;
+    }
+    const timer = setTimeout(async () => {
+      refreshCountRef.current++;
+      await refresh();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [todayStatus, progress, refresh, router]);
 
   // 로딩 중 또는 결과 저장 대기 중
   if (progress === null || todayStatus === "not_started" || todayStatus === "in_progress") {
