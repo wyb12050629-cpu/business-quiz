@@ -31,12 +31,12 @@ export default function QuizPage() {
 
   useEffect(() => { preloadRewardedAd(); }, []);
 
-  // Firestore 초기값으로 localStep 한 번만 초기화
+  // Firestore 초기값으로 localStep 한 번만 초기화 (progress 로드 후)
   useEffect(() => {
-    if (localStep === null && totalQuestions > 0) {
+    if (localStep === null) {
       setLocalStep(currentStepIndex);
     }
-  }, [currentStepIndex, localStep, totalQuestions]);
+  }, [currentStepIndex, localStep]);
 
   // 완료(성공/실패) 시 결과로 이동
   useEffect(() => {
@@ -73,8 +73,7 @@ export default function QuizPage() {
 
   // 다음 문제로: Firestore 응답 기다리지 않고 즉시 UI 전환
   function handleNextQuestion() {
-    const next = (localStep ?? 0) + 1;
-    setLocalStep(next);
+    setLocalStep((prev) => (prev ?? 0) + 1); // 함수형 업데이트 — 항상 최신 값 기준
     setAnswerState("unanswered");
     setSelectedIndex(null);
     setShowModal(false);
