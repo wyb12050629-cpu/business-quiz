@@ -10,9 +10,16 @@ import { getRankByCoins } from "@/lib/ranks";
 export default function ResultPage() {
   const router = useRouter();
   const { todayStatus, progress, streak, totalPoints, sessionPoints, score, refresh } = useGameState();
-  const refreshCountRef = useRef(0);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+
+  // ── ref로 최신 값 추적 (setInterval 내부 stale closure 방지) ──
+  const todayStatusRef = useRef(todayStatus);
+  const refreshRef = useRef(refresh);
+  const routerRef = useRef(router);
+  useEffect(() => { todayStatusRef.current = todayStatus; }, [todayStatus]);
+  useEffect(() => { refreshRef.current = refresh; }, [refresh]);
+  useEffect(() => { routerRef.current = router; }, [router]);
 
   // 10초 안에 progress가 로드되지 않으면 타임아웃 → "다시 시도" 버튼 표시
   useEffect(() => {
@@ -29,23 +36,38 @@ export default function ResultPage() {
     }
   }, [todayStatus, progress, router]);
 
-  // in_progress 폴링: 1.5초마다 Firestore 재조회 (최대 8회 → 12초)
+  // in_progress 폴링: setInterval 기반 — progress 변화에 의존하지 않아 안정적
+  // refresh()가 실패해도 interval이 계속 돌며 재시도함
   useEffect(() => {
-    if (progress === null || todayStatus !== "in_progress") {
-      refreshCountRef.current = 0;
-      return;
-    }
-    if (refreshCountRef.current >= 8) {
-      // 8번 시도 후에도 in_progress → 홈 이동
-      router.replace("/");
-      return;
-    }
-    const timer = setTimeout(async () => {
-      refreshCountRef.current++;
-      await refresh();
+    if (progress === null || todayStatus !== "in_progress") return;
+
+    let count = 0;
+    const MAX = 8; // 최대 8회 × 1.5초 = 12초
+
+    const interval = setInterval(async () => {
+      count++;
+      const status = todayStatusRef.current;
+
+      if (status === "success" || status === "failure") {
+        clearInterval(interval);
+        return;
+      }
+      if (count >= MAX) {
+        clearInterval(interval);
+        routerRef.current.replace("/");
+        return;
+      }
+      try {
+        await refreshRef.current();
+      } catch {
+        // 실패해도 다음 interval에서 재시도
+      }
     }, 1500);
-    return () => clearTimeout(timer);
-  }, [todayStatus, progress, refresh, router]);
+
+    return () => clearInterval(interval);
+  // progress와 todayStatus가 처음 in_progress일 때 한 번만 시작
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress === null ? "null" : todayStatus === "in_progress" ? "polling" : "done"]);
 
   // ── 로딩 중 ──────────────────────────────────────────
   if (progress === null) {
