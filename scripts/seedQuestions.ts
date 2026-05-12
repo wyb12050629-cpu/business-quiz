@@ -38,6 +38,7 @@ interface QuestionItem {
   options: string[];
   answerIndex: number;
   explanation: string;
+  difficulty?: "easy" | "medium" | "hard"; // easy=5S, medium=10S, hard=15S
 }
 
 type Difficulty = "easy" | "medium" | "hard";
