@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  distDir: '.next/web',
+  images: { unoptimized: true },
   webpack: (config, { isServer }) => {
     // @apps-in-toss/web-framework 의 React Native 의존성이
     // 서버 사이드 번들에 포함되지 않도록 처리
