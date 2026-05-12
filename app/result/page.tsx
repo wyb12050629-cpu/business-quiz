@@ -11,15 +11,18 @@ export default function ResultPage() {
   const router = useRouter();
   const { todayStatus, progress, streak, totalPoints, sessionPoints, score } = useGameState();
 
-  // progress === null → 아직 Firestore 로딩 중. 로딩 완료 후에만 리다이렉트 판단
+  // progress 로드 완료 후 상태 판단
+  // - not_started: 오늘 퀴즈 안 함 → 홈으로
+  // - in_progress: 결과 저장 중일 수 있음 → 스피너 유지 (리다이렉트 안함)
+  // - success/failure: 결과 페이지 표시
   useEffect(() => {
-    if (progress === null) return; // 로딩 대기
-    if (todayStatus === "not_started" || todayStatus === "in_progress") {
+    if (progress === null) return; // 아직 로딩 중
+    if (todayStatus === "not_started") {
       router.replace("/");
     }
   }, [todayStatus, progress, router]);
 
-  // 로딩 중이거나 아직 완료 안 된 상태면 스피너
+  // 로딩 중 또는 결과 저장 대기 중
   if (progress === null || todayStatus === "not_started" || todayStatus === "in_progress") {
     return (
       <div className="flex items-center justify-center min-h-screen">

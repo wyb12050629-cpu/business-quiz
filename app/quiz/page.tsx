@@ -149,7 +149,7 @@ export default function QuizPage() {
             isCorrect={true}
             explanation={currentQuestion.explanation}
             points={currentQuestion.points}
-            onNext={handleNextQuestion}
+            onNext={isLastQuestion ? () => router.replace("/result") : handleNextQuestion}
             isLast={isLastQuestion}
           />
         )}
