@@ -74,11 +74,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function identify() {
       const tossKey = await getTossUserId();
 
+      // Toss 키 획득 여부와 무관하게 항상 Firebase 익명 로그인 실행.
+      // Firestore 보안 규칙이 request.auth != null 을 요구하므로,
+      // Firebase Auth 토큰이 없으면 모든 read/write가 permission-denied로 거부됨.
+      // Toss 키는 userId(데이터 식별자)로 사용하고,
+      // Firebase Auth는 Firestore 접근 권한용으로 별도 처리.
+
       if (!cancelled && tossKey) {
         localStorage.setItem(LS_KEY, tossKey);
         setUserId(tossKey);
         setAuthSource("toss");
-        setLoading(false);
+        // Firestore 권한용 Firebase 익명 로그인 (userId는 tossKey 유지)
+        try {
+          await signInAnonymously(auth);
+        } catch {
+          // 실패해도 userId는 tossKey로 유지 — Firestore 규칙이 허용적이면 동작
+        }
+        if (!cancelled) setLoading(false);
         return;
       }
 
