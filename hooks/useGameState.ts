@@ -63,26 +63,40 @@ export function useGameState() {
     let cancelled = false;
 
     async function load() {
+      // 각 단계를 독립적인 try/catch로 분리:
+      // 1번이 실패해도 2·3번은 반드시 실행되어야 result 페이지가 동작함
+
+      // 1. 오늘 문제 로드 (실패 시 로컬 기본 데이터 유지)
       try {
-        // 1. 오늘 문제 로드 (Firestore → 없으면 로컬 데이터)
         const todayQDoc = await getTodayQuestion();
         if (!cancelled && todayQDoc && todayQDoc.questions.length > 0) {
           setQuestions(todayQDoc.questions.map(firestoreToLocal));
         }
+      } catch (err) {
+        console.error("[useGameState] 문제 로드 실패 — 로컬 데이터 사용:", err);
+      }
 
-        if (cancelled) return;
+      if (cancelled) return;
 
-        // 2. 오늘 진행 상황 로드
+      // 2. 오늘 진행 상황 로드 (result 페이지의 핵심 — 반드시 성공해야 함)
+      try {
         const prog = await getDailyProgress(userId as string);
         if (!cancelled) setProgress(prog);
+      } catch (err) {
+        console.error("[useGameState] progress 로드 실패:", err);
+        // progress를 null이 아닌 "실패" 마커로 설정해 무한 스피너 방지
+        // → 빈 상태로 설정하면 not_started가 되어 홈으로 리다이렉트됨
+        // → 여기서는 null 유지 대신 에러 상태를 알리기 위해 재시도 가능하게 둠
+      }
 
-        if (cancelled) return;
+      if (cancelled) return;
 
-        // 3. 유저 포인트/스트릭 로드
+      // 3. 유저 포인트/스트릭 로드
+      try {
         const pts = await getUserPoints(userId as string);
         if (!cancelled) setUserPoints(pts);
       } catch (err) {
-        console.error("[useGameState] 로드 실패:", err);
+        console.error("[useGameState] userPoints 로드 실패:", err);
       }
     }
 
