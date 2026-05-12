@@ -16,7 +16,7 @@ export default function ExplanationCard({
   isLast,
 }: ExplanationCardProps) {
   return (
-    <div className={`rounded-2xl p-5 mt-4 border-l-4 ${isCorrect ? "bg-green-50 border-green-400" : "bg-rose-50 border-rose-400"}`}>
+    <div className={`rounded-2xl p-5 mt-4 ${isCorrect ? "bg-green-50" : "bg-rose-50"}`}>
       {/* 정답/오답 헤더 */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">{isCorrect ? "✅" : "❌"}</span>
