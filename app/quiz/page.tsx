@@ -20,6 +20,7 @@ export default function QuizPage() {
     currentQuestion,
     totalQuestions,
     currentStepIndex,
+    advanceStep,
   } = useGameState();
 
   const [answerState, setAnswerState] = useState<AnswerState>("unanswered");
@@ -65,8 +66,8 @@ export default function QuizPage() {
   }
 
   function handleNextQuestion() {
-    setAnswerState("unanswered");
-    setSelectedIndex(null);
+    advanceStep(); // 낙관적 업데이트 — Firestore 응답 기다리지 않고 즉시 다음 문제로
+    // currentStepIndex 변경 → useEffect가 answerState/selectedIndex 초기화
   }
 
   function handleRetry() {

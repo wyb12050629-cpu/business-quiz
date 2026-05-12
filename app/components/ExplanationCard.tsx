@@ -23,7 +23,7 @@ export default function ExplanationCard({
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">{isCorrect ? "✅" : "❌"}</span>
         <span className={`font-bold text-base ${isCorrect ? "text-green-600" : "text-rose-500"}`}>
-          {isCorrect ? `정답! +${points}P` : "오답"}
+          {isCorrect ? `정답! +${points}S` : "오답"}
         </span>
       </div>
 

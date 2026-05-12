@@ -154,6 +154,15 @@ export function useGameState() {
     [userId, progress, totalQuestions]
   );
 
+  // ── 다음 문제로 즉시 이동 (낙관적 업데이트) ─────────
+  // Firestore 응답을 기다리지 않고 UI를 즉시 다음 문제로 전환
+  const advanceStep = useCallback(() => {
+    setProgress((prev) => {
+      if (!prev) return prev;
+      return { ...prev, currentStep: prev.currentStep + 1 };
+    });
+  }, []);
+
   // ── 보너스 스탬프 지급 (광고 시청 리워드 등) ────────
   const addBonusStamps = useCallback(async (amount: number) => {
     if (!userId) return;
@@ -209,5 +218,6 @@ export function useGameState() {
     handleCorrect,
     handleFailure,
     addBonusStamps,
+    advanceStep,
   };
 }
