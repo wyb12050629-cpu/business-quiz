@@ -222,11 +222,6 @@ function TodayChallengeCard({
           <p className="text-sm mt-1 text-gray-400">
             {score}/{totalQuestions} 정답 · +{sessionPoints} 스탬프 획득
           </p>
-          <div className="mt-3 py-2 px-4 rounded-xl inline-block bg-blue-50">
-            <span className="text-sm font-semibold text-blue-500">
-              내일 또 도전하면 스트릭이 이어져요 🔥
-            </span>
-          </div>
         </div>
       )}
 
