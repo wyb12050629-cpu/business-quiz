@@ -21,9 +21,9 @@ import {
 // 광고 그룹 ID 상수
 // ────────────────────────────────────────────────────────────
 export const AD_GROUP_IDS = {
-  BANNER: "ait-ad-test-banner-id",             // ✏️ 출시 전 교체
-  REWARDED: "61da5ee5-11e8-4db3-8e4e-69387cbc0895",
-  INTERSTITIAL: "ait-ad-test-interstitial-id", // ✏️ 출시 전 교체
+  BANNER: "ait.v2.live.7dcbc970fbd64914",
+  REWARDED: "ait.v2.live.0e829aaf49e54308",
+  INTERSTITIAL: "ait-ad-test-interstitial-id",
 } as const;
 
 /** 콘솔 > 공유 리워드에서 발급받은 moduleId ✏️ */
