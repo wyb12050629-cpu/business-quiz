@@ -1169,68 +1169,32 @@ interface DayAssignment {
 
 function distributeQuestions(): DayAssignment[] {
   const categories = ["노동법", "급여세금", "직장에티켓", "비즈니스용어", "복지혜택"];
-  const difficulties: Difficulty[] = ["easy", "medium", "hard"];
 
-  // 카테고리별 난이도별 문제 복사
-  const pools: Record<string, Record<Difficulty, QuestionItem[]>> = {};
-  for (const cat of categories) {
-    pools[cat] = {
-      easy: [...questionPool[cat].easy],
-      medium: [...questionPool[cat].medium],
-      hard: [...questionPool[cat].hard],
-    };
-  }
+  // 카테고리별 전체 문제를 하나의 배열로 합치기 (easy → medium → hard 순)
+  const pools: QuestionItem[][] = categories.map((cat) => [
+    ...questionPool[cat].easy,
+    ...questionPool[cat].medium,
+    ...questionPool[cat].hard,
+  ]);
 
-  // 각 카테고리별 총 문제 수 (난이도별로 뽑아야 하는 수)
-  // 노동법:24 (easy8, medium8, hard8)
-  // 급여세금:21 (easy7, medium7, hard7)
-  // 직장에티켓:18 (easy6, medium6, hard6)
-  // 비즈니스용어:15 (easy5, medium5, hard5)
-  // 복지혜택:12 (easy4, medium4, hard4)
-
-  const today = dayjs();
-  const days: DayAssignment[] = [];
-
-  // 카테고리별 사용 카운터
-  const used: Record<string, number> = {};
-  for (const cat of categories) {
-    used[cat] = 0;
-  }
-
-  const totalPerCategory: Record<string, number> = {
-    노동법: 24,
-    급여세금: 21,
-    직장에티켓: 18,
-    비즈니스용어: 15,
-    복지혜택: 12,
-  };
-
-  for (let d = 0; d < 30; d++) {
-    const date = today.add(d, "day").format("YYYY-MM-DD");
-
-    // 남은 문제 수가 많은 카테고리 우선 선택 (서로 다른 3개)
-    const remaining = categories
-      .map((cat) => ({ cat, left: totalPerCategory[cat] - used[cat] }))
-      .filter((x) => x.left > 0)
-      .sort((a, b) => b.left - a.left);
-
-    const selectedCats = remaining.slice(0, 3).map((x) => x.cat);
-
-    const questions: QuestionItem[] = [];
-
-    for (let i = 0; i < 3; i++) {
-      const cat = selectedCats[i];
-      const diff = difficulties[i]; // easy, medium, hard 순
-      const pool = pools[cat][diff];
-      const q = pool.shift()!;
-      questions.push(q);
-      used[cat]++;
+  // 라운드로빈으로 90문제 추출 (카테고리 다양성 확보)
+  const ordered: QuestionItem[] = [];
+  let ci = 0;
+  while (ordered.length < 90) {
+    const pool = pools[ci % categories.length];
+    if (pool.length > 0) {
+      ordered.push(pool.shift()!);
     }
-
-    days.push({ date, questions });
+    ci++;
+    if (ci > 10000) break; // 안전 장치
   }
 
-  return days;
+  // 3문제씩 30일로 분배
+  const today = dayjs();
+  return Array.from({ length: 30 }, (_, d) => ({
+    date: today.add(d, "day").format("YYYY-MM-DD"),
+    questions: ordered.slice(d * 3, (d + 1) * 3),
+  }));
 }
 
 // ─── 시딩 실행 ───────────────────────────────────────────
