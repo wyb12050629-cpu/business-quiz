@@ -28,6 +28,8 @@ export default function QuizPage() {
   const [answerState, setAnswerState] = useState<AnswerState>("unanswered");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  // 마지막 문제 정답 후 Firestore 저장 대기 중 오버레이
+  const [awaitingResult, setAwaitingResult] = useState(false);
 
   useEffect(() => { preloadRewardedAd(); }, []);
 
@@ -38,12 +40,19 @@ export default function QuizPage() {
     }
   }, [currentStepIndex, localStep]);
 
-  // 완료(성공/실패) 시 결과로 이동
+  // 완료(성공/실패) 시 결과로 이동 — handleCorrect 완료 후 Firestore 쓰기 보장
   useEffect(() => {
     if (todayStatus === "success" || todayStatus === "failure") {
       router.replace("/result");
     }
   }, [todayStatus, router]);
+
+  // 안전 장치: awaitingResult 상태에서 5초 초과 시 강제 이동
+  useEffect(() => {
+    if (!awaitingResult) return;
+    const timer = setTimeout(() => router.replace("/result"), 5000);
+    return () => clearTimeout(timer);
+  }, [awaitingResult, router]);
 
   // ── 현재 문제 계산 ──────────────────────────────────────
   const shownStep = localStep ?? currentStepIndex;
@@ -149,7 +158,9 @@ export default function QuizPage() {
             isCorrect={true}
             explanation={currentQuestion.explanation}
             points={currentQuestion.points}
-            onNext={isLastQuestion ? () => router.replace("/result") : handleNextQuestion}
+            onNext={isLastQuestion
+              ? () => setAwaitingResult(true)  // Firestore 저장 완료 대기
+              : handleNextQuestion}
             isLast={isLastQuestion}
           />
         )}
@@ -172,6 +183,14 @@ export default function QuizPage() {
           onRetry={handleRetry}
           onNext={handleCloseModal}
         />
+      )}
+
+      {/* 마지막 문제 저장 대기 오버레이 */}
+      {awaitingResult && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-4" />
+          <p className="text-sm font-medium text-gray-500">결과를 저장하고 있어요...</p>
+        </div>
       )}
     </div>
   );
