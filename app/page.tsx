@@ -6,7 +6,7 @@ import { useGameState, TodayStatus } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
 import PointBadge from "@/app/components/PointBadge";
 import RankCard from "@/app/components/RankCard";
-import { showRewardedAd } from "@/lib/toss-sdk";
+import { showRewardedAd, AD_GROUP_IDS } from "@/lib/toss-sdk";
 
 const NAME_KEY = "quiz_user_name";
 
@@ -65,7 +65,8 @@ export default function HomePage() {
       () => {
         // 광고 실패
         setAdState("idle");
-      }
+      },
+      AD_GROUP_IDS.REWARDED_STAMP
     );
   }
 

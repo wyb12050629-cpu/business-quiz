@@ -24,7 +24,8 @@ import {
 // ────────────────────────────────────────────────────────────
 export const AD_GROUP_IDS = {
   BANNER: "ait.v2.live.7dcbc970fbd64914",
-  REWARDED: "ait.v2.live.0e829aaf49e54308",
+  REWARDED_STAMP: "ait.v2.live.7ead2ae75a32496c",  // 홈 — 광고 보고 스탬프 50개
+  REWARDED_RETRY: "ait.v2.live.0e829aaf49e54308",  // 오답 — 광고 보고 다시 도전
   INTERSTITIAL: "ait-ad-test-interstitial-id",
 } as const;
 
@@ -111,7 +112,9 @@ export function attachBannerAd(
 let unregisterLoad: (() => void) | null = null;
 
 /** 리워드 광고 미리 로드 (퀴즈 화면 진입 시 호출 권장) */
-export function preloadRewardedAd(): () => void {
+export function preloadRewardedAd(
+  adGroupId: string = AD_GROUP_IDS.REWARDED_RETRY
+): () => void {
   if (!safeIsSupported(loadFullScreenAd)) {
     console.warn("[FullScreenAd] 미지원 환경 (토스앱 5.247+ 필요)");
     return () => {};
@@ -119,7 +122,7 @@ export function preloadRewardedAd(): () => void {
   unregisterLoad?.();
 
   const unregister = loadFullScreenAd({
-    options: { adGroupId: AD_GROUP_IDS.REWARDED },
+    options: { adGroupId },
     onEvent: (event) => {
       if (event.type === "loaded") {
         console.debug("[FullScreenAd] 리워드 광고 로드 완료");
@@ -143,7 +146,8 @@ export function preloadRewardedAd(): () => void {
 export function showRewardedAd(
   onRewarded: (unitType: string, unitAmount: number) => void,
   onDismissed?: () => void,
-  onFailed?: () => void
+  onFailed?: () => void,
+  adGroupId: string = AD_GROUP_IDS.REWARDED_RETRY
 ): void {
   // 개발 환경 / 미지원 환경 fallback
   if (!safeIsSupported(showFullScreenAd)) {
@@ -153,7 +157,7 @@ export function showRewardedAd(
   }
 
   const unregister = showFullScreenAd({
-    options: { adGroupId: AD_GROUP_IDS.REWARDED },
+    options: { adGroupId },
     onEvent: (event) => {
       switch (event.type) {
         case "requested":
