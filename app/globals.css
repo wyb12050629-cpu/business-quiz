@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --toss-blue: #3182f6;
+  --toss-blue-dark: #1b64da;
+  --toss-gray-50: #f9fafb;
+  --toss-gray-100: #f2f4f6;
+  --toss-gray-200: #e5e8eb;
+  --toss-gray-500: #8b95a1;
+  --toss-gray-700: #4e5968;
+  --toss-gray-900: #191f28;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, "Pretendard Variable", Pretendard, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  background-color: var(--toss-gray-50);
+  color: var(--toss-gray-900);
+  overscroll-behavior: none;
+}
+
+/* 토스 버튼 스타일 */
+.btn-primary {
+  @apply w-full py-4 rounded-2xl font-semibold text-white text-base transition-all active:scale-95;
+  background-color: var(--toss-blue);
+}
+.btn-primary:active {
+  background-color: var(--toss-blue-dark);
+}
+
+.btn-secondary {
+  @apply w-full py-4 rounded-2xl font-semibold text-base transition-all active:scale-95;
+  background-color: var(--toss-gray-100);
+  color: var(--toss-gray-700);
+}
+
+/* 카드 */
+.card {
+  @apply bg-white rounded-2xl p-5 shadow-sm;
+}
+
+/* 광고 배너 컨테이너 — 게임형 서비스 하단 고정 */
+#banner-ad-container {
+  width: 100%;
+  height: 96px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 448px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: #fff;
+  z-index: 40;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
