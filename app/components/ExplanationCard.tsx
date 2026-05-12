@@ -18,33 +18,24 @@ export default function ExplanationCard({
   isLast,
 }: ExplanationCardProps) {
   return (
-    <div
-      className="rounded-2xl p-5 mt-4"
-      style={{
-        backgroundColor: isCorrect ? "#f0fdf4" : "#fff1f2",
-        borderLeft: `4px solid ${isCorrect ? "#22c55e" : "#f43f5e"}`,
-      }}
-    >
+    <div className={`rounded-2xl p-5 mt-4 border-l-4 ${isCorrect ? "bg-green-50 border-green-400" : "bg-rose-50 border-rose-400"}`}>
       {/* 정답/오답 헤더 */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">{isCorrect ? "✅" : "❌"}</span>
-        <span
-          className="font-bold text-base"
-          style={{ color: isCorrect ? "#16a34a" : "#e11d48" }}
-        >
+        <span className={`font-bold text-base ${isCorrect ? "text-green-600" : "text-rose-500"}`}>
           {isCorrect ? `정답! +${points}P` : "오답"}
         </span>
       </div>
 
       {/* 정답 표시 (오답인 경우) */}
       {!isCorrect && (
-        <p className="text-sm font-semibold mb-1" style={{ color: "#e11d48" }}>
+        <p className="text-sm font-semibold mb-1 text-rose-500">
           정답: {correctAnswer}
         </p>
       )}
 
       {/* 해설 */}
-      <p className="text-sm leading-relaxed" style={{ color: "#4e5968" }}>
+      <p className="text-sm leading-relaxed text-slate-600">
         {explanation}
       </p>
 
@@ -52,8 +43,7 @@ export default function ExplanationCard({
       {isCorrect && (
         <button
           onClick={onNext}
-          className="w-full mt-4 py-3 rounded-xl font-semibold text-white text-sm active:scale-95 transition-all"
-          style={{ backgroundColor: "#3182f6" }}
+          className="w-full mt-4 py-3 rounded-xl font-semibold text-white text-sm active:scale-95 transition-all bg-blue-500"
         >
           {isLast ? "결과 보기 🎉" : "다음 문제 →"}
         </button>

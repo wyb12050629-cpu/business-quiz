@@ -32,7 +32,7 @@ function firestoreToLocal(q: QuestionItem, idx: number) {
     options: q.options,
     answer: q.answerIndex,
     explanation: q.explanation,
-    points: 10, // Firestore에 포인트 필드 없으면 기본 10P
+    points: 5, // Firestore에 포인트 필드 없으면 기본 5P
     category: q.category,
   };
 }
@@ -122,9 +122,21 @@ export function useGameState() {
 
   // ── 정답 처리 ─────────────────────────────────
   const handleCorrect = useCallback(
-    async (points: number = 10) => {
-      if (!userId || !progress) return;
-      const step = progress.currentStep; // 1-indexed
+    async (points: number = 5) => {
+      if (!userId) return;
+      // progress가 아직 로드 안 됐으면 먼저 가져옴 (다음 문제 안 넘어가는 버그 방지)
+      let currentProgress = progress;
+      if (!currentProgress) {
+        try {
+          currentProgress = await getDailyProgress(userId);
+          setProgress(currentProgress);
+        } catch (err) {
+          console.error("[useGameState] handleCorrect - progress 로드 실패:", err);
+          return;
+        }
+      }
+
+      const step = currentProgress.currentStep; // 1-indexed
       const isLast = step >= totalQuestions;
 
       try {
@@ -142,10 +154,32 @@ export function useGameState() {
     [userId, progress, totalQuestions]
   );
 
+  // ── 보너스 스탬프 지급 (광고 시청 리워드 등) ────────
+  const addBonusStamps = useCallback(async (amount: number) => {
+    if (!userId) return;
+    try {
+      const pts = await updateUserPoints(userId, amount, false);
+      setUserPoints(pts);
+    } catch (err) {
+      console.error("[useGameState] addBonusStamps 실패:", err);
+    }
+  }, [userId]);
+
   // ── 오답 처리 (기회 사용 후 또 틀림 or 기회 거부) ───
   const handleFailure = useCallback(async () => {
-    if (!userId || !progress) return;
-    const step = progress.currentStep;
+    if (!userId) return;
+    let currentProgress = progress;
+    if (!currentProgress) {
+      try {
+        currentProgress = await getDailyProgress(userId);
+        setProgress(currentProgress);
+      } catch (err) {
+        console.error("[useGameState] handleFailure - progress 로드 실패:", err);
+        return;
+      }
+    }
+
+    const step = currentProgress.currentStep;
 
     try {
       const updated = await saveStepResult(userId, step, false, false, 0, totalQuestions);
@@ -174,5 +208,6 @@ export function useGameState() {
     startQuiz,
     handleCorrect,
     handleFailure,
+    addBonusStamps,
   };
 }

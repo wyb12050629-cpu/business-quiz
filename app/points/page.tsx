@@ -1,15 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
-import { MAX_POINTS } from "@/lib/quiz-data";
+import { RANKS, getRankProgress } from "@/lib/ranks";
 
-export default function PointsPage() {
+export default function CareerPage() {
   const router = useRouter();
   const { totalPoints, streak } = useGameState();
 
-  // 오늘 최대 획득 가능 포인트 대비 퍼센트
-  const completionRate = Math.min(100, Math.round((totalPoints / (MAX_POINTS * 5)) * 100));
+  const { current, next, progress, stampsToNext } = getRankProgress(totalPoints);
 
   return (
     <div className="flex flex-col min-h-screen px-5 pt-12 pb-10">
@@ -23,78 +23,143 @@ export default function PointsPage() {
             <path d="M15 18l-6-6 6-6" stroke="#191f28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        <h1 className="text-xl font-bold" style={{ color: "#191f28" }}>내 포인트</h1>
+        <h1 className="text-xl font-bold text-gray-900">내 커리어</h1>
       </div>
 
-      {/* 총 포인트 */}
-      <div
-        className="rounded-3xl p-6 mb-4 text-center"
-        style={{ background: "linear-gradient(135deg, #3182f6 0%, #1b64da 100%)" }}
-      >
-        <p className="text-white/70 text-sm mb-1">누적 포인트</p>
-        <p className="text-white text-5xl font-bold mb-1">
-          {totalPoints.toLocaleString()}
-        </p>
-        <p className="text-white/70 text-sm">P</p>
-      </div>
+      {/* 현재 직급 대형 카드 */}
+      <div className="rounded-3xl p-5 mb-4 bg-gradient-to-br from-blue-500 to-blue-700">
+        <div className="flex items-center gap-4">
+          {/* 캐릭터 이미지 */}
+          <div className="relative w-24 h-24 flex-shrink-0">
+            <Image
+              src={current.image}
+              alt={current.title}
+              fill
+              className="object-contain drop-shadow-lg"
+              unoptimized
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            {/* 말풍선 */}
+            <div className="relative bg-white/20 rounded-2xl px-3 py-2 mb-3">
+              <div className="absolute -left-1.5 top-3 w-3 h-3 bg-white/20 rotate-45 rounded-sm" />
+              <p className="text-xs text-white/90 leading-snug">{current.speech}</p>
+            </div>
+            {/* 직급명 */}
+            <div className="flex items-center gap-2">
+              <span className="text-white text-lg font-bold">{current.emoji} {current.title}</span>
+            </div>
+            <p className="text-white/70 text-xs mt-0.5">💼 {totalPoints.toLocaleString()} 스탬프 보유</p>
+          </div>
+        </div>
 
-      {/* 스트릭 현황 */}
-      <div className="card mb-4">
-        <p className="text-xs font-semibold mb-3" style={{ color: "#8b95a1" }}>연속 도전</p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🔥</span>
-            <div>
-              <p className="font-bold text-base" style={{ color: "#191f28" }}>
-                {streak.count}일 연속
-              </p>
-              <p className="text-xs" style={{ color: "#8b95a1" }}>
-                {streak.lastSuccessDate
-                  ? `마지막 성공: ${streak.lastSuccessDate}`
-                  : "아직 기록 없음"}
-              </p>
+        {/* 다음 직급 프로그레스 */}
+        {next ? (
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-white/70 text-xs">다음: {next.emoji} {next.title}</span>
+              <span className="text-white text-xs font-semibold">{stampsToNext} 스탬프 더 필요해요</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-white/20">
+              <div
+                className="h-2 rounded-full bg-white transition-all duration-700"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
-          <div
-            className="px-3 py-1.5 rounded-xl text-sm font-semibold"
-            style={{ backgroundColor: "#fff7ed", color: "#c2410c" }}
-          >
-            {streak.count >= 7 ? "🏆 주간 달성" : streak.count >= 3 ? "🔥 달리는 중" : "⚡ 시작"}
+        ) : (
+          <div className="mt-4 text-center">
+            <span className="text-white/90 text-sm font-semibold">👑 최고 직급 달성!</span>
+          </div>
+        )}
+      </div>
+
+      {/* 스탯 카드 */}
+      <div className="card mb-4">
+        <div className="grid grid-cols-2 divide-x divide-gray-100 text-center">
+          <div className="px-3 py-1">
+            <p className="text-2xl font-bold text-amber-400">{totalPoints.toLocaleString()}</p>
+            <p className="text-xs mt-1 text-gray-400">누적 스탬프</p>
+          </div>
+          <div className="px-3 py-1">
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-xl">🔥</span>
+              <p className="text-2xl font-bold text-orange-500">{streak.count}</p>
+            </div>
+            <p className="text-xs mt-1 text-gray-400">연속 도전</p>
           </div>
         </div>
       </div>
 
-      {/* 달성도 */}
-      <div className="card mb-4">
-        <p className="text-xs font-semibold mb-3" style={{ color: "#8b95a1" }}>포인트 달성도</p>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium" style={{ color: "#191f28" }}>
-            목표 달성률
-          </span>
-          <span className="text-sm font-bold" style={{ color: "#3182f6" }}>
-            {completionRate}%
-          </span>
+      {/* 직급 사다리 */}
+      <div className="card">
+        <p className="text-xs font-semibold mb-4 text-gray-400">직급 사다리</p>
+        <div className="relative">
+          {/* 세로 연결선 */}
+          <div className="absolute left-4 top-3 bottom-3 w-0.5 bg-gray-100" />
+
+          <div className="space-y-0">
+            {[...RANKS].reverse().map((rank, reversedIdx) => {
+              const rankIdx = RANKS.length - 1 - reversedIdx;
+              const isAchieved = totalPoints >= rank.minCoins;
+              const isCurrent = rank.title === current.title;
+
+              return (
+                <div key={rank.title} className="flex items-center gap-3 py-2">
+                  {/* 점 (타임라인) */}
+                  <div className={[
+                    "relative z-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm transition-all",
+                    isCurrent
+                      ? "bg-blue-500 shadow-lg shadow-blue-200 scale-110"
+                      : isAchieved
+                      ? "bg-blue-100"
+                      : "bg-gray-100",
+                  ].join(" ")}>
+                    {isCurrent ? (
+                      <span className="text-white text-xs font-bold">●</span>
+                    ) : isAchieved ? (
+                      <span className="text-blue-500 text-xs">✓</span>
+                    ) : (
+                      <span className="text-gray-300 text-xs">○</span>
+                    )}
+                  </div>
+
+                  {/* 직급 정보 */}
+                  <div className="flex-1 flex items-center justify-between">
+                    <div>
+                      <p className={[
+                        "text-sm font-semibold",
+                        isCurrent ? "text-blue-600" : isAchieved ? "text-gray-700" : "text-gray-300",
+                      ].join(" ")}>
+                        {rank.emoji} {rank.title}
+                        {isCurrent && (
+                          <span className="ml-2 text-xs font-normal bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">
+                            현재
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <p className={[
+                      "text-xs font-medium",
+                      isCurrent ? "text-blue-500" : isAchieved ? "text-gray-400" : "text-gray-200",
+                    ].join(" ")}>
+                      {rank.minCoins.toLocaleString()}S
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="w-full h-3 rounded-full" style={{ backgroundColor: "#e5e8eb" }}>
-          <div
-            className="h-3 rounded-full transition-all duration-700"
-            style={{ width: `${completionRate}%`, backgroundColor: "#3182f6" }}
-          />
-        </div>
-        <p className="text-xs mt-2" style={{ color: "#8b95a1" }}>
-          하루 최대 {MAX_POINTS}P · 매일 풀수록 포인트가 쌓여요
-        </p>
       </div>
 
       {/* 안내 */}
-      <div className="rounded-2xl p-4" style={{ backgroundColor: "#f2f4f6" }}>
-        <p className="text-sm font-semibold mb-2" style={{ color: "#191f28" }}>
-          💡 포인트 안내
-        </p>
-        <ul className="text-xs space-y-1" style={{ color: "#4e5968" }}>
-          <li>• 문제 정답 시 10~15P 지급</li>
-          <li>• 포인트 현금화 기능은 준비 중이에요</li>
-          <li>• 광고 시청 또는 공유로 재도전 기회를 얻을 수 있어요</li>
+      <div className="rounded-2xl p-4 mt-4 bg-gray-100">
+        <p className="text-sm font-semibold mb-1 text-gray-900">💡 스탬프 안내</p>
+        <ul className="text-xs space-y-1 text-slate-600">
+          <li>• 퀴즈 정답 시 최대 5스탬프 지급</li>
+          <li>• 매일 퀴즈를 풀수록 스탬프가 쌓여요</li>
+          <li>• 스탬프가 쌓이면 직급이 올라가요 🚀</li>
         </ul>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
 import { showShareReward } from "@/lib/toss-sdk";
+import { getRankByCoins } from "@/lib/ranks";
 
 export default function ResultPage() {
   const router = useRouter();
@@ -19,12 +20,18 @@ export default function ResultPage() {
   if (todayStatus === "not_started" || todayStatus === "in_progress") {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
 
   const isSuccess = todayStatus === "success";
+
+  // 직급 승진 감지
+  const prevCoins = Math.max(0, totalPoints - sessionPoints);
+  const currentRank = getRankByCoins(totalPoints);
+  const prevRank = getRankByCoins(prevCoins);
+  const isRankUp = isSuccess && currentRank.title !== prevRank.title;
 
   function handleShare() {
     showShareReward(
@@ -42,13 +49,24 @@ export default function ResultPage() {
 
   return (
     <div className="flex flex-col min-h-screen px-5 pt-14 pb-10">
+      {/* 직급 승진 배너 */}
+      {isRankUp && (
+        <div className="rounded-2xl p-4 mb-4 text-center bg-yellow-50 border border-yellow-200">
+          <p className="text-2xl mb-1">🎊</p>
+          <p className="text-sm font-bold text-yellow-800">
+            {prevRank.emoji} {prevRank.title} → {currentRank.emoji} {currentRank.title}
+          </p>
+          <p className="text-xs text-yellow-600 mt-0.5">직급이 올랐어요! 축하해요!</p>
+        </div>
+      )}
+
       {/* 이모지 & 타이틀 */}
       <div className="text-center mb-8">
         <div className="text-6xl mb-4 animate-bounce">{isSuccess ? "🎉" : "😢"}</div>
-        <h1 className="text-2xl font-bold mb-2" style={{ color: "#191f28" }}>
+        <h1 className="text-2xl font-bold mb-2 text-gray-900">
           {isSuccess ? "퀴즈 완료!" : "오늘은 여기까지!"}
         </h1>
-        <p className="text-sm" style={{ color: "#8b95a1" }}>
+        <p className="text-sm text-gray-400">
           {isSuccess
             ? "모든 문제를 풀었어요. 대단해요!"
             : `${progress?.failedAtStep ?? "?"}번 문제에서 오늘 도전이 끝났어요`}
@@ -59,22 +77,34 @@ export default function ResultPage() {
       <div className="card mb-4">
         <div className="grid grid-cols-3 divide-x divide-gray-100 text-center">
           <div className="px-2">
-            <p className="text-2xl font-bold" style={{ color: "#3182f6" }}>{score}</p>
-            <p className="text-xs mt-1" style={{ color: "#8b95a1" }}>정답</p>
+            <p className="text-2xl font-bold text-blue-500">{score}</p>
+            <p className="text-xs mt-1 text-gray-400">정답</p>
           </div>
           <div className="px-2">
-            <p className="text-2xl font-bold" style={{ color: "#191f28" }}>
-              {sessionPoints}<span className="text-sm font-semibold ml-0.5">P</span>
+            <p className="text-2xl font-bold text-gray-900">
+              {sessionPoints}<span className="text-sm font-semibold ml-0.5">S</span>
             </p>
-            <p className="text-xs mt-1" style={{ color: "#8b95a1" }}>오늘 획득</p>
+            <p className="text-xs mt-1 text-gray-400">오늘 획득</p>
           </div>
           <div className="px-2">
-            <p className="text-2xl font-bold" style={{ color: "#f59e0b" }}>
-              {totalPoints}<span className="text-sm font-semibold ml-0.5">P</span>
+            <p className="text-2xl font-bold text-amber-400">
+              {totalPoints}<span className="text-sm font-semibold ml-0.5">S</span>
             </p>
-            <p className="text-xs mt-1" style={{ color: "#8b95a1" }}>누적</p>
+            <p className="text-xs mt-1 text-gray-400">누적</p>
           </div>
         </div>
+      </div>
+
+      {/* 현재 직급 */}
+      <div className="card mb-4 flex items-center gap-3">
+        <span className="text-3xl">{currentRank.emoji}</span>
+        <div>
+          <p className="text-xs text-gray-400 mb-0.5">현재 직급</p>
+          <p className="font-bold text-base text-gray-900">{currentRank.title}</p>
+        </div>
+        <span className={`ml-auto text-xs font-bold px-2.5 py-1 rounded-full ${currentRank.badgeBg} ${currentRank.badgeText}`}>
+          💼 {totalPoints.toLocaleString()}S
+        </span>
       </div>
 
       {/* 성공: 스트릭 */}
@@ -86,9 +116,9 @@ export default function ResultPage() {
 
       {/* 실패: 내일 안내 */}
       {!isSuccess && (
-        <div className="rounded-2xl p-4 mb-4" style={{ backgroundColor: "#fff1f2" }}>
-          <p className="text-sm font-semibold mb-1" style={{ color: "#e11d48" }}>😢 내일 다시 도전해요</p>
-          <p className="text-xs" style={{ color: "#9f1239" }}>
+        <div className="rounded-2xl p-4 mb-4 bg-rose-50">
+          <p className="text-sm font-semibold mb-1 text-rose-600">😢 내일 다시 도전해요</p>
+          <p className="text-xs text-rose-800">
             내일은 1번 문제부터 다시 시작돼요. 오늘 틀린 문제를 복습해 보세요!
           </p>
         </div>
@@ -98,24 +128,21 @@ export default function ResultPage() {
       <div className="mt-auto space-y-3">
         <button
           onClick={handleShare}
-          className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
-          style={{ backgroundColor: "#3182f6" }}
+          className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
         >
           <span>🔗</span>
           <span>친구에게 공유하기</span>
         </button>
         <button
           onClick={() => router.push("/points")}
-          className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all"
-          style={{ backgroundColor: "#f2f4f6", color: "#4e5968" }}
+          className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
         >
-          <span>⭐</span>
-          <span>포인트 내역 보기</span>
+          <span>💼</span>
+          <span>커리어 현황 보기</span>
         </button>
         <button
           onClick={() => router.push("/")}
-          className="w-full py-3 text-sm font-medium active:scale-95 transition-all"
-          style={{ color: "#8b95a1" }}
+          className="w-full py-3 text-sm font-medium active:scale-95 transition-all text-gray-400"
         >
           홈으로 돌아가기
         </button>

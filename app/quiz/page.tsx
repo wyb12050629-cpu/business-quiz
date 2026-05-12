@@ -45,7 +45,7 @@ export default function QuizPage() {
   if (!currentQuestion) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -69,14 +69,12 @@ export default function QuizPage() {
     setSelectedIndex(null);
   }
 
-  // 광고/공유 후 재도전
   function handleRetry() {
     setShowModal(false);
     setAnswerState("unanswered");
     setSelectedIndex(null);
   }
 
-  // 기회 사용 안 하고 종료
   function handleCloseModal() {
     setShowModal(false);
     handleFailure();
@@ -97,14 +95,11 @@ export default function QuizPage() {
 
       {/* 문제 */}
       <div className="flex-1 px-5">
-        <span
-          className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-4"
-          style={{ backgroundColor: "#ebf3ff", color: "#3182f6" }}
-        >
+        <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-4 bg-blue-50 text-blue-500">
           {currentQuestion.category}
         </span>
 
-        <h2 className="text-xl font-bold leading-snug mb-6" style={{ color: "#191f28" }}>
+        <h2 className="text-xl font-bold leading-snug mb-6 text-gray-900">
           {currentQuestion.question}
         </h2>
 
@@ -114,21 +109,23 @@ export default function QuizPage() {
             const isCorrectOption = index === currentQuestion.answer;
             const revealed = answerState !== "unanswered";
 
-            let bg = "#ffffff", border = "#e5e8eb", textColor = "#191f28";
-            if (revealed) {
-              if (isCorrectOption) { bg = "#f0fdf4"; border = "#22c55e"; textColor = "#16a34a"; }
-              else if (isSelected) { bg = "#fff1f2"; border = "#f43f5e"; textColor = "#e11d48"; }
-            } else if (isSelected) {
-              bg = "#ebf3ff"; border = "#3182f6"; textColor = "#3182f6";
-            }
+            const btnClass = [
+              "w-full text-left px-4 py-4 rounded-2xl border-2 font-medium text-sm transition-all active:scale-95",
+              revealed && isCorrectOption
+                ? "bg-green-50 border-green-400 text-green-600"
+                : revealed && isSelected
+                ? "bg-rose-50 border-rose-400 text-rose-500"
+                : !revealed && isSelected
+                ? "bg-blue-50 border-blue-500 text-blue-500"
+                : "bg-white border-gray-200 text-gray-900",
+            ].join(" ");
 
             return (
               <button
                 key={index}
                 onClick={() => handleOptionSelect(index)}
                 disabled={answerState !== "unanswered"}
-                className="w-full text-left px-4 py-4 rounded-2xl border-2 font-medium text-sm transition-all active:scale-95"
-                style={{ backgroundColor: bg, borderColor: border, color: textColor }}
+                className={btnClass}
               >
                 <span className="font-bold mr-2">{["①", "②", "③", "④"][index]}</span>
                 {option}
@@ -160,10 +157,8 @@ export default function QuizPage() {
         )}
       </div>
 
-      {/* 배너 광고 */}
       <BannerAd />
 
-      {/* ChanceModal */}
       {showModal && (
         <WrongAnswerModal
           correctAnswer={currentQuestion.options[currentQuestion.answer]}

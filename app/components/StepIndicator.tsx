@@ -11,21 +11,15 @@ export default function StepIndicator({ current, total }: StepIndicatorProps) {
       {Array.from({ length: total }).map((_, i) => (
         <div
           key={i}
-          className="rounded-full transition-all duration-300"
-          style={{
-            width: i === current ? 20 : 8,
-            height: 8,
-            backgroundColor:
-              i < current
-                ? "#3182f6"
-                : i === current
-                ? "#3182f6"
-                : "#e5e8eb",
-            opacity: i < current ? 0.4 : 1,
-          }}
+          className={[
+            "rounded-full transition-all duration-300 h-2",
+            i === current ? "w-5" : "w-2",
+            i <= current ? "bg-blue-500" : "bg-gray-200",
+            i < current ? "opacity-40" : "opacity-100",
+          ].join(" ")}
         />
       ))}
-      <span className="ml-2 text-sm font-medium" style={{ color: "#8b95a1" }}>
+      <span className="ml-2 text-sm font-medium text-gray-400">
         {current + 1}/{total}
       </span>
     </div>

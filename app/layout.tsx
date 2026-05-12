@@ -4,8 +4,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import TossAdsInitializer from "@/app/components/TossAdsInitializer";
 
 export const metadata: Metadata = {
-  title: "비즈니스 퀴즈",
-  description: "비즈니스 지식을 퀴즈로 테스트하고 포인트를 모아보세요!",
+  title: "직장인 상식 퀴즈",
+  description: "직장인 필수 상식을 퀴즈로 테스트하고 포인트를 모아보세요!",
   other: {
     "toss-mini-app": "true",
   },

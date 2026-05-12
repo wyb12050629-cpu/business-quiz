@@ -6,8 +6,6 @@ interface PointBadgeProps {
 }
 
 export default function PointBadge({ value, size = "md" }: PointBadgeProps) {
-  const displayPoints = value;
-
   const sizeClass = {
     sm: "text-sm px-3 py-1",
     md: "text-base px-4 py-2",
@@ -15,12 +13,9 @@ export default function PointBadge({ value, size = "md" }: PointBadgeProps) {
   }[size];
 
   return (
-    <div
-      className={`inline-flex items-center gap-1.5 rounded-full font-semibold ${sizeClass}`}
-      style={{ backgroundColor: "#EBF3FF", color: "#3182f6" }}
-    >
-      <span>⭐</span>
-      <span>{displayPoints.toLocaleString()}P</span>
+    <div className={`inline-flex items-center gap-1.5 rounded-full font-semibold bg-blue-50 text-blue-500 ${sizeClass}`}>
+      <span>💼</span>
+      <span>{value.toLocaleString()}</span>
     </div>
   );
 }
