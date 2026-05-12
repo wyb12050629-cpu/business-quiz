@@ -22,6 +22,8 @@ export interface QuestionItem {
   options: string[];
   answerIndex: number;
   explanation: string;
+  difficulty?: "easy" | "medium" | "hard"; // 쉬움=5, 보통=10, 어려움=15
+  points?: number; // difficulty 없을 때 직접 지정
 }
 
 export interface QuestionsDoc {
@@ -218,6 +220,11 @@ export async function updateUserPoints(
     }
     data.lastSuccessDate = today;
     data.maxStreak = Math.max(data.maxStreak, data.streak);
+
+    // 7일마다 보너스 10스탬프
+    if (data.streak % 7 === 0) {
+      data.totalPoints += 10;
+    }
   } else {
     data.streak = 0;
   }

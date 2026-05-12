@@ -16,7 +16,7 @@ export default function RankCard({ totalStamps, onWatchAd, adState = "idle" }: R
     <div className="card">
       {/* 캐릭터 + 말풍선 */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="relative w-20 h-20 flex-shrink-0">
+        <div className="relative w-28 h-28 flex-shrink-0">
           <Image
             src={current.image}
             alt={current.title}

@@ -27,17 +27,12 @@ export default function ExplanationCard({
         </span>
       </div>
 
-      {/* 정답 표시 (오답인 경우) */}
-      {!isCorrect && (
-        <p className="text-sm font-semibold mb-1 text-rose-500">
-          정답: {correctAnswer}
+      {/* 해설 — 정답인 경우만 표시 */}
+      {isCorrect && (
+        <p className="text-sm leading-relaxed text-slate-600">
+          {explanation}
         </p>
       )}
-
-      {/* 해설 */}
-      <p className="text-sm leading-relaxed text-slate-600">
-        {explanation}
-      </p>
 
       {/* 다음 버튼 (정답인 경우만) */}
       {isCorrect && (

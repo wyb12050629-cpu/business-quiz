@@ -22,7 +22,7 @@ export const quizData: QuizQuestion[] = [
     ],
     answer: 1,
     explanation: "MVP는 핵심 기능만 담은 최소한의 제품으로, 빠르게 시장 반응을 테스트하기 위해 출시해요.",
-    points: 5,
+    points: 5,   // easy
     category: "스타트업",
   },
   {
@@ -36,7 +36,7 @@ export const quizData: QuizQuestion[] = [
     ],
     answer: 1,
     explanation: "손익분기점(Break-Even Point)은 총수익 = 총비용이 되는 매출 수준으로, 이 지점부터 이익이 발생해요.",
-    points: 5,
+    points: 10,  // medium
     category: "재무",
   },
   {
@@ -50,7 +50,7 @@ export const quizData: QuizQuestion[] = [
     ],
     answer: 0,
     explanation: "ROAS(Return On Ad Spend)는 광고비 1원당 발생한 매출을 나타내며, 높을수록 광고 효율이 좋아요.",
-    points: 5,
+    points: 15,  // hard
     category: "마케팅",
   },
 ];

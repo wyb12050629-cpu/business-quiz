@@ -82,9 +82,9 @@ export default function HomePage() {
           💡 이렇게 진행돼요
         </p>
         <ul className="text-xs space-y-1 text-slate-600">
-          <li>• 총 {totalQuestions}문제, 문제당 최대 5스탬프</li>
+          <li>• 매일 3문제, 문제당 최대 15스탬프</li>
           <li>• 틀리면 광고 보기 or 친구 공유로 재도전 가능</li>
-          <li>• 매일 완료하면 스트릭이 쌓여요 🔥</li>
+          <li>• 매일 출석하면 7일마다 추가 10스탬프 🔥</li>
         </ul>
       </div>
 

@@ -82,12 +82,8 @@ export default function WrongAnswerModal({
           <h2 className="text-xl font-bold mb-1 text-gray-900">
             아쉽게도 틀렸어요
           </h2>
-          <p className="text-sm text-slate-600">
-            정답:{" "}
-            <span className="font-semibold text-blue-500">{correctAnswer}</span>
-          </p>
-          <p className="text-sm mt-1 leading-relaxed px-2 text-gray-400">
-            {explanation}
+          <p className="text-sm text-slate-500">
+            광고를 보고 다시 도전하면 정답을 맞힐 수 있어요!
           </p>
         </div>
 

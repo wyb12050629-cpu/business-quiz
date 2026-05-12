@@ -18,7 +18,9 @@ export default function StreakCard({ count }: StreakCardProps) {
           {count}일 연속 성공 중!
         </p>
         <p className="text-xs text-orange-500">
-          오늘도 퀴즈를 완료해서 스트릭을 이어가세요
+          {count % 7 === 0
+            ? `🎁 ${count}일 달성! 보너스 10스탬프 받았어요`
+            : `7일마다 추가 10스탬프 — ${7 - (count % 7)}일 남았어요`}
         </p>
       </div>
     </div>

@@ -24,16 +24,23 @@ export interface StreakData {
   lastSuccessDate: string;
 }
 
+// difficulty → 스탬프 변환표: 쉬움=5, 보통=10, 어려움=15
+const DIFFICULTY_POINTS: Record<string, number> = { easy: 5, medium: 10, hard: 15 };
+
 // Firestore QuestionItem → 로컬 QuizQuestion 형식으로 변환
 function firestoreToLocal(q: QuestionItem, idx: number) {
+  const points =
+    q.points ??
+    (q.difficulty ? DIFFICULTY_POINTS[q.difficulty] : 5);
   return {
     id: idx + 1,
     question: q.question,
     options: q.options,
     answer: q.answerIndex,
     explanation: q.explanation,
-    points: 5, // Firestore에 포인트 필드 없으면 기본 5P
+    points,
     category: q.category,
+    difficulty: q.difficulty,
   };
 }
 
