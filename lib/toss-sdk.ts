@@ -22,7 +22,7 @@ import {
 // ────────────────────────────────────────────────────────────
 export const AD_GROUP_IDS = {
   BANNER: "ait-ad-test-banner-id",             // ✏️ 출시 전 교체
-  REWARDED: "ait-ad-test-rewarded-id",         // ✏️ 출시 전 교체
+  REWARDED: "61da5ee5-11e8-4db3-8e4e-69387cbc0895",
   INTERSTITIAL: "ait-ad-test-interstitial-id", // ✏️ 출시 전 교체
 } as const;
 
@@ -89,7 +89,6 @@ export function attachBannerAd(
 //       → dismissed → 다음 로드
 // ────────────────────────────────────────────────────────────
 let unregisterLoad: (() => void) | null = null;
-let isAdLoaded = false;
 
 /** 리워드 광고 미리 로드 (퀴즈 화면 진입 시 호출 권장) */
 export function preloadRewardedAd(): () => void {
@@ -97,20 +96,17 @@ export function preloadRewardedAd(): () => void {
     console.warn("[FullScreenAd] 미지원 환경 (토스앱 5.247+ 필요)");
     return () => {};
   }
-  isAdLoaded = false;
   unregisterLoad?.();
 
   const unregister = loadFullScreenAd({
     options: { adGroupId: AD_GROUP_IDS.REWARDED },
     onEvent: (event) => {
       if (event.type === "loaded") {
-        isAdLoaded = true;
         console.debug("[FullScreenAd] 리워드 광고 로드 완료");
       }
     },
     onError: (error) => {
       console.error("[FullScreenAd] 광고 로드 실패:", error);
-      isAdLoaded = false;
     },
   });
 

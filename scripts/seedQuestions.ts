@@ -3,9 +3,26 @@ import dayjs from "dayjs";
 
 // ─── Admin SDK 초기화 ────────────────────────────────────
 
-const serviceAccount = JSON.parse(
-  process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "{}"
-);
+// 환경변수 → 없으면 serviceAccountKey.json 파일 순으로 로드
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+let serviceAccount: object;
+if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+} else {
+  const keyPath = resolve(__dirname, "../serviceAccountKey.json");
+  try {
+    serviceAccount = JSON.parse(readFileSync(keyPath, "utf-8"));
+  } catch {
+    console.error("❌ serviceAccountKey.json 파일을 찾을 수 없어요.");
+    console.error("   Firebase Console → 프로젝트 설정 → 서비스 계정 → 새 비공개 키 생성");
+    process.exit(1);
+  }
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

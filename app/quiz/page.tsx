@@ -15,7 +15,6 @@ export default function QuizPage() {
   const router = useRouter();
   const {
     todayStatus,
-    progress,
     hydrated,
     handleCorrect,
     handleFailure,

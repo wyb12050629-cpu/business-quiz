@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase 서비스 계정 키 (절대 Git에 올리지 마세요!)
+serviceAccountKey.json

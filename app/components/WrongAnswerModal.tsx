@@ -30,7 +30,7 @@ export default function WrongAnswerModal({
 
     showRewardedAd(
       // onRewarded: userEarnedReward 이벤트 → 리워드 지급
-      (_unitType, _unitAmount) => {
+      () => {
         setMessage("기회 1회가 추가됐어요! 다시 도전해 보세요 🎉");
         setState("done");
         setTimeout(onRetry, 1200);

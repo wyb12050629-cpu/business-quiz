@@ -8,7 +8,7 @@ import { showShareReward } from "@/lib/toss-sdk";
 
 export default function ResultPage() {
   const router = useRouter();
-  const { todayStatus, progress, streak, totalPoints, sessionPoints, score, totalQuestions, hydrated } = useGameState();
+  const { todayStatus, progress, streak, totalPoints, sessionPoints, score, hydrated } = useGameState();
 
   useEffect(() => {
     if (!hydrated) return;
