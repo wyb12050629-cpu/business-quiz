@@ -62,11 +62,8 @@ export default function BannerAd() {
   }, [isInitialized, attachBanner]);
 
   return (
-    <div
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md h-24 bg-white z-40"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      <div ref={containerRef} className="w-full h-24" aria-label="광고" />
+    <div id="banner-ad-container">
+      <div ref={containerRef} className="w-full h-full" aria-label="광고" />
     </div>
   );
 }

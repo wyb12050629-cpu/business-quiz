@@ -216,6 +216,7 @@ export function useGameState() {
     totalPoints,
     sessionPoints,
     score,
+    questions,       // 전체 문제 배열 (quiz 페이지 로컬 스텝용)
     currentQuestion,
     totalQuestions,
     currentStepIndex: clampedIndex,

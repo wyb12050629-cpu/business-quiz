@@ -17,31 +17,39 @@ export default function QuizPage() {
     todayStatus,
     handleCorrect,
     handleFailure,
-    currentQuestion,
+    questions,
     totalQuestions,
-    currentStepIndex,
-    advanceStep,
+    currentStepIndex, // Firestore 기준 초기 스텝 (초기화 용도)
   } = useGameState();
 
+  // ── 로컬 스텝: Firestore 타이밍과 완전히 분리 ──────────
+  // null = 아직 Firestore 초기값 대기 중
+  const [localStep, setLocalStep] = useState<number | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>("unanswered");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { preloadRewardedAd(); }, []);
 
-  // 완료 시 결과로 이동
+  // Firestore 초기값으로 localStep 한 번만 초기화
+  useEffect(() => {
+    if (localStep === null && totalQuestions > 0) {
+      setLocalStep(currentStepIndex);
+    }
+  }, [currentStepIndex, localStep, totalQuestions]);
+
+  // 완료(성공/실패) 시 결과로 이동
   useEffect(() => {
     if (todayStatus === "success" || todayStatus === "failure") {
       router.replace("/result");
     }
   }, [todayStatus, router]);
 
-  // 문제 바뀔 때 초기화
-  useEffect(() => {
-    setAnswerState("unanswered");
-    setSelectedIndex(null);
-    setShowModal(false);
-  }, [currentStepIndex]);
+  // ── 현재 문제 계산 ──────────────────────────────────────
+  const shownStep = localStep ?? currentStepIndex;
+  const clampedStep = Math.min(shownStep, totalQuestions - 1);
+  const currentQuestion = questions[clampedStep] ?? null;
+  const isLastQuestion = shownStep >= totalQuestions - 1;
 
   if (!currentQuestion) {
     return (
@@ -51,23 +59,25 @@ export default function QuizPage() {
     );
   }
 
-  const isLastQuestion = currentStepIndex >= totalQuestions - 1;
-
   function handleOptionSelect(index: number) {
     if (answerState !== "unanswered") return;
     setSelectedIndex(index);
-    if (index === currentQuestion.answer) {
+    if (index === currentQuestion!.answer) {
       setAnswerState("correct");
-      handleCorrect(currentQuestion.points);
+      handleCorrect(currentQuestion!.points);
     } else {
       setAnswerState("wrong");
       setShowModal(true);
     }
   }
 
+  // 다음 문제로: Firestore 응답 기다리지 않고 즉시 UI 전환
   function handleNextQuestion() {
-    advanceStep(); // 낙관적 업데이트 — Firestore 응답 기다리지 않고 즉시 다음 문제로
-    // currentStepIndex 변경 → useEffect가 answerState/selectedIndex 초기화
+    const next = (localStep ?? 0) + 1;
+    setLocalStep(next);
+    setAnswerState("unanswered");
+    setSelectedIndex(null);
+    setShowModal(false);
   }
 
   function handleRetry() {
@@ -90,7 +100,7 @@ export default function QuizPage() {
             <path d="M15 18l-6-6 6-6" stroke="#191f28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        <StepIndicator current={currentStepIndex} total={totalQuestions} />
+        <StepIndicator current={shownStep} total={totalQuestions} />
         <div className="w-8" />
       </div>
 
