@@ -133,19 +133,22 @@ export function useGameState() {
   const handleCorrect = useCallback(
     async (points: number = 5) => {
       if (!userId) return;
-      // progress가 아직 로드 안 됐으면 먼저 가져옴 (다음 문제 안 넘어가는 버그 방지)
-      let currentProgress = progress;
-      if (!currentProgress) {
-        try {
-          currentProgress = await getDailyProgress(userId);
-          setProgress(currentProgress);
-        } catch (err) {
-          console.error("[useGameState] handleCorrect - progress 로드 실패:", err);
-          return;
-        }
+
+      // React state(progress)는 이전 렌더의 스냅샷이라 stale할 수 있음.
+      // Firestore 쓰기가 완료되기 전에 다음 문제로 빠르게 넘어가면
+      // progress.currentStep이 이전 단계 값을 가리켜 saveStepResult가
+      // 잘못된 step을 저장하고 isSuccess가 영원히 false가 되는 버그 발생.
+      // → 항상 Firestore에서 최신 step을 직접 읽어 stale closure를 원천 차단.
+      let currentProgress: DailyProgress;
+      try {
+        currentProgress = await getDailyProgress(userId);
+        setProgress(currentProgress);
+      } catch (err) {
+        console.error("[useGameState] handleCorrect - progress 조회 실패:", err);
+        return;
       }
 
-      const step = currentProgress.currentStep; // 1-indexed
+      const step = currentProgress.currentStep; // 1-indexed, 항상 최신값
       const isLast = step >= totalQuestions;
 
       try {
@@ -160,7 +163,7 @@ export function useGameState() {
         console.error("[useGameState] handleCorrect 실패:", err);
       }
     },
-    [userId, progress, totalQuestions]
+    [userId, totalQuestions] // progress 제거 — 항상 Firestore 직접 조회하므로 불필요
   );
 
   // ── 다음 문제로 즉시 이동 (낙관적 업데이트) ─────────
