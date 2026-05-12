@@ -138,7 +138,6 @@ export default function QuizPage() {
         {answerState === "correct" && (
           <ExplanationCard
             isCorrect={true}
-            correctAnswer={currentQuestion.options[currentQuestion.answer]}
             explanation={currentQuestion.explanation}
             points={currentQuestion.points}
             onNext={handleNextQuestion}
@@ -149,7 +148,6 @@ export default function QuizPage() {
         {answerState === "wrong" && !showModal && (
           <ExplanationCard
             isCorrect={false}
-            correctAnswer={currentQuestion.options[currentQuestion.answer]}
             explanation={currentQuestion.explanation}
             points={currentQuestion.points}
             onNext={() => {}}
@@ -162,8 +160,6 @@ export default function QuizPage() {
 
       {showModal && (
         <WrongAnswerModal
-          correctAnswer={currentQuestion.options[currentQuestion.answer]}
-          explanation={currentQuestion.explanation}
           onRetry={handleRetry}
           onNext={handleCloseModal}
         />

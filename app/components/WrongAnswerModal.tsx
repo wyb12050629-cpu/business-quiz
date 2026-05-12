@@ -6,8 +6,6 @@ import { showRewardedAd, showShareReward } from "@/lib/toss-sdk";
 interface WrongAnswerModalProps {
   onRetry: () => void;
   onNext: () => void;
-  correctAnswer: string;
-  explanation: string;
 }
 
 type ModalState = "idle" | "loading" | "done";
@@ -15,8 +13,6 @@ type ModalState = "idle" | "loading" | "done";
 export default function WrongAnswerModal({
   onRetry,
   onNext,
-  correctAnswer,
-  explanation,
 }: WrongAnswerModalProps) {
   const [state, setState] = useState<ModalState>("idle");
   const [message, setMessage] = useState("");

@@ -2,7 +2,6 @@
 
 interface ExplanationCardProps {
   isCorrect: boolean;
-  correctAnswer: string;
   explanation: string;
   points: number;
   onNext: () => void;
@@ -11,7 +10,6 @@ interface ExplanationCardProps {
 
 export default function ExplanationCard({
   isCorrect,
-  correctAnswer,
   explanation,
   points,
   onNext,
