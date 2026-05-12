@@ -182,7 +182,9 @@ function TodayChallengeCard({
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl">🎯</span>
             <div>
-              <p className="font-bold text-base text-gray-900">총 {totalQuestions}문제 도전</p>
+              <p className="font-bold text-base text-gray-900">
+                {new Date().toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit" }).replace(/\. /g, "-").replace(".", "")} {totalQuestions}문제 도전
+              </p>
               <p className="text-sm text-gray-400">직장인 상식을 테스트해 보세요!</p>
             </div>
           </div>
