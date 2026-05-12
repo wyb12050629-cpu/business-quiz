@@ -94,7 +94,10 @@ export default function QuizPage() {
     setSelectedIndex(null);
   }
 
-  function handleCloseModal() {
+  // 오늘 도전 포기 — modal이 열려있을 때 호출 (백드롭·포기버튼·헤더 뒤로가기)
+  // handleFailure가 Firestore에 isFailed=true를 쓰면 todayStatus → "failure" →
+  // useEffect가 /result로 자동 이동
+  function handleGiveUp() {
     setShowModal(false);
     handleFailure();
   }
@@ -103,7 +106,12 @@ export default function QuizPage() {
     <div className="flex flex-col min-h-screen pb-28">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
-        <button onClick={() => router.push("/")} className="p-2 -ml-2 active:scale-95 transition-all" aria-label="홈으로">
+        {/* 모달 열려있을 때 뒤로가기 = 포기 */}
+        <button
+          onClick={() => showModal ? handleGiveUp() : router.push("/")}
+          className="p-2 -ml-2 active:scale-95 transition-all"
+          aria-label="홈으로"
+        >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M15 18l-6-6 6-6" stroke="#191f28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -181,7 +189,7 @@ export default function QuizPage() {
       {showModal && (
         <WrongAnswerModal
           onRetry={handleRetry}
-          onNext={handleCloseModal}
+          onGiveUp={handleGiveUp}
         />
       )}
 

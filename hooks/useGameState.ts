@@ -213,24 +213,27 @@ export function useGameState() {
     }
   }, [userId]);
 
-  // ── 오답 처리 (기회 사용 후 또 틀림 or 기회 거부) ───
+  // ── 오답 처리 (광고/공유 거부 or "내일 다시 도전하기") ───
+  // usedChance=true → saveStepResult 내부에서 isFailed=true, isCompleted=true 세팅됨
+  // → todayStatus가 "failure"로 바뀌어 result 페이지로 이동
   const handleFailure = useCallback(async () => {
     if (!userId) return;
-    let currentProgress = progress;
-    if (!currentProgress) {
-      try {
-        currentProgress = await getDailyProgress(userId);
-        setProgress(currentProgress);
-      } catch (err) {
-        console.error("[useGameState] handleFailure - progress 로드 실패:", err);
-        return;
-      }
+
+    // handleCorrect와 동일하게 항상 Firestore에서 최신 step을 읽어 stale closure 방지
+    let currentProgress: DailyProgress;
+    try {
+      currentProgress = await getDailyProgress(userId);
+      setProgress(currentProgress);
+    } catch (err) {
+      console.error("[useGameState] handleFailure - progress 로드 실패:", err);
+      return;
     }
 
     const step = currentProgress.currentStep;
 
     try {
-      const updated = await saveStepResult(userId, step, false, false, 0, totalQuestions);
+      // usedChance=true: 이 문제에서 재도전 기회를 소진했으므로 하루 도전 종료
+      const updated = await saveStepResult(userId, step, false, true, 0, totalQuestions);
       setProgress(updated);
       await updateUserPoints(userId, updated.totalPointsToday, false);
       const pts = await getUserPoints(userId);
@@ -238,7 +241,7 @@ export function useGameState() {
     } catch (err) {
       console.error("[useGameState] handleFailure 실패:", err);
     }
-  }, [userId, progress, totalQuestions]);
+  }, [userId, totalQuestions]);
 
   return {
     // 상태

@@ -5,14 +5,15 @@ import { showRewardedAd, showShareReward, CHANCE_MODULE_ID } from "@/lib/toss-sd
 
 interface WrongAnswerModalProps {
   onRetry: () => void;
-  onNext: () => void;
+  /** 기회 포기 — 오늘 도전 종료. 호출 시 Firestore에 isFailed=true 저장됨 */
+  onGiveUp: () => void;
 }
 
 type ModalState = "idle" | "loading" | "done";
 
 export default function WrongAnswerModal({
   onRetry,
-  onNext,
+  onGiveUp,
 }: WrongAnswerModalProps) {
   const [state, setState] = useState<ModalState>("idle");
   const [message, setMessage] = useState("");
@@ -69,7 +70,8 @@ export default function WrongAnswerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onNext} />
+      {/* 백드롭 클릭 = 오늘 도전 포기 */}
+      <div className="absolute inset-0 bg-black/40" onClick={onGiveUp} />
 
       <div className="relative w-full max-w-md bg-white rounded-t-3xl px-5 pt-6 pb-10 z-10">
         <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
@@ -80,7 +82,7 @@ export default function WrongAnswerModal({
             아쉽게도 틀렸어요
           </h2>
           <p className="text-sm text-slate-500">
-            광고를 보고 다시 도전하면 정답을 맞힐 수 있어요!
+            광고를 보거나 친구에게 공유하면 다시 도전할 수 있어요
           </p>
         </div>
 
@@ -91,35 +93,31 @@ export default function WrongAnswerModal({
         )}
 
         {state === "idle" && (
-          <>
-            <p className="text-center text-sm font-medium mb-4 text-slate-600">
-              한 번 더 도전할 기회를 얻으세요!
-            </p>
-            <div className="space-y-3">
-              <button
-                onClick={handleWatchAd}
-                className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
-              >
-                <span>📺</span>
-                <span>광고 보고 다시 도전</span>
-              </button>
+          <div className="space-y-3">
+            <button
+              onClick={handleWatchAd}
+              className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
+            >
+              <span>📺</span>
+              <span>광고 보고 다시 도전</span>
+            </button>
 
-              <button
-                onClick={handleShare}
-                className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
-              >
-                <span>🔗</span>
-                <span>친구에게 공유하고 다시 도전</span>
-              </button>
+            <button
+              onClick={handleShare}
+              className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
+            >
+              <span>🔗</span>
+              <span>친구에게 공유하고 다시 도전</span>
+            </button>
 
-              <button
-                onClick={onNext}
-                className="w-full py-3 text-sm font-medium active:scale-95 transition-all text-gray-400"
-              >
-                오늘은 여기까지 (기회 포기)
-              </button>
-            </div>
-          </>
+            {/* 포기 버튼 — 오늘 도전 종료, 내일부터 다시 시작 */}
+            <button
+              onClick={onGiveUp}
+              className="w-full py-3 text-sm font-medium active:scale-95 transition-all text-rose-400"
+            >
+              내일 다시 도전하기
+            </button>
+          </div>
         )}
 
         {state === "loading" && (

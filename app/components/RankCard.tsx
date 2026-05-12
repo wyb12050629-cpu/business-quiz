@@ -30,11 +30,19 @@ export default function RankCard({ totalStamps, userName, onWatchAd, adState = "
         </div>
 
         <div className="relative flex-1">
-          {/* 이름 + 직급 */}
+          {/* 이름 + 직급 + 내 커리어 보기 배지 */}
           {userName && (
-            <p className="text-sm font-bold text-gray-900 mb-1.5">
-              {userName} <span className="text-blue-500">{current.title}</span>
-            </p>
+            <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+              <p className="text-sm font-bold text-gray-900">
+                {userName} <span className="text-blue-500">{current.title}</span>
+              </p>
+              <button
+                onClick={() => router.push("/points")}
+                className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500 text-white active:scale-95 transition-all flex-shrink-0"
+              >
+                내 커리어 보기
+              </button>
+            </div>
           )}
           {/* 말풍선 */}
           <div className="absolute -left-1.5 top-4 w-3 h-3 bg-blue-50 rotate-45 rounded-sm z-0"
@@ -47,14 +55,11 @@ export default function RankCard({ totalStamps, userName, onWatchAd, adState = "
         </div>
       </div>
 
-      {/* 직급 배지 — 클릭 시 내 직급 페이지 이동 */}
+      {/* 직급 배지 (표시 전용) */}
       <div className="flex items-center gap-2 mb-3">
-        <button
-          onClick={() => router.push("/points")}
-          className={`text-xs font-bold px-2.5 py-1 rounded-full active:scale-95 transition-all ${current.badgeBg} ${current.badgeText}`}
-        >
+        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${current.badgeBg} ${current.badgeText}`}>
           {current.emoji} {current.title}
-        </button>
+        </span>
         <span className="text-xs text-gray-400">💼 {totalStamps.toLocaleString()} 스탬프</span>
       </div>
 
