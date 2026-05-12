@@ -99,8 +99,7 @@ export default function CareerPage() {
           <div className="absolute left-4 top-3 bottom-3 w-0.5 bg-gray-100" />
 
           <div className="space-y-0">
-            {[...RANKS].reverse().map((rank, reversedIdx) => {
-              const rankIdx = RANKS.length - 1 - reversedIdx;
+            {[...RANKS].reverse().map((rank) => {
               const isAchieved = totalPoints >= rank.minCoins;
               const isCurrent = rank.title === current.title;
 
