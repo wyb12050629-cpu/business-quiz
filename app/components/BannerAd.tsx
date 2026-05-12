@@ -63,10 +63,12 @@ export default function BannerAd() {
 
   return (
     <div
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md h-24 bg-white z-40"
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white z-40"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div ref={containerRef} className="w-full h-24" aria-label="광고" />
+      {/* height 고정 금지 — 광고 콘텐츠 높이에 맞게 자동 조절 */}
+      {/* 위아래 8px 이상 여백 권장 */}
+      <div ref={containerRef} className="w-full py-2" aria-label="광고" />
     </div>
   );
 }
