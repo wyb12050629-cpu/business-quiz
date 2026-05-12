@@ -28,7 +28,15 @@ export default function RankCard({ totalStamps, userName, onWatchAd, adState = "
         </div>
 
         <div className="relative flex-1">
-          <div className="absolute -left-1.5 top-4 w-3 h-3 bg-blue-50 rotate-45 rounded-sm z-0" />
+          {/* 이름 + 직급 */}
+          {userName && (
+            <p className="text-sm font-bold text-gray-900 mb-1.5">
+              {userName} <span className="text-blue-500">{current.title}</span>
+            </p>
+          )}
+          {/* 말풍선 */}
+          <div className="absolute -left-1.5 top-4 w-3 h-3 bg-blue-50 rotate-45 rounded-sm z-0"
+            style={userName ? { top: "3.5rem" } : {}} />
           <div className="relative z-10 bg-blue-50 rounded-2xl px-3 py-2.5">
             <p className="text-xs font-medium text-blue-800 leading-snug">
               {current.speech}
