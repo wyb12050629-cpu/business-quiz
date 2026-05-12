@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { getRankProgress } from "@/lib/ranks";
 
 interface RankCardProps {
@@ -11,6 +12,7 @@ interface RankCardProps {
 }
 
 export default function RankCard({ totalStamps, userName, onWatchAd, adState = "idle" }: RankCardProps) {
+  const router = useRouter();
   const { current, next, progress, stampsToNext } = getRankProgress(totalStamps);
 
   return (
@@ -45,11 +47,14 @@ export default function RankCard({ totalStamps, userName, onWatchAd, adState = "
         </div>
       </div>
 
-      {/* 직급 배지 */}
+      {/* 직급 배지 — 클릭 시 내 직급 페이지 이동 */}
       <div className="flex items-center gap-2 mb-3">
-        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${current.badgeBg} ${current.badgeText}`}>
-          {current.emoji} {userName ? `${userName} ${current.title}` : current.title}
-        </span>
+        <button
+          onClick={() => router.push("/points")}
+          className={`text-xs font-bold px-2.5 py-1 rounded-full active:scale-95 transition-all ${current.badgeBg} ${current.badgeText}`}
+        >
+          {current.emoji} {current.title}
+        </button>
         <span className="text-xs text-gray-400">💼 {totalStamps.toLocaleString()} 스탬프</span>
       </div>
 
