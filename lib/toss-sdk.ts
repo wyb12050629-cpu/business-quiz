@@ -15,6 +15,8 @@ import {
   loadFullScreenAd,
   showFullScreenAd,
   contactsViral,
+  getTossShareLink,
+  share,
 } from "@apps-in-toss/web-framework";
 
 // ────────────────────────────────────────────────────────────
@@ -28,6 +30,10 @@ export const AD_GROUP_IDS = {
 
 /** 결과 페이지 공유 → 스탬프 5개 지급 */
 export const SHARE_MODULE_ID = "d4fd7b9c-6647-418f-ab22-f32953786e5f";
+
+/** OG 이미지 URL (Firebase Storage) */
+export const OG_IMAGE_URL =
+  "https://firebasestorage.googleapis.com/v0/b/business-quiz-1fd54.firebasestorage.app/o/Frame%203.png?alt=media&token=65a54fda-d02f-4974-bdf4-553cf4da8401";
 
 /** 오답 시 공유 → 재도전 기회 1회 지급 */
 export const CHANCE_MODULE_ID = "61da5ee5-11e8-4db3-8e4e-69387cbc0895";
@@ -231,6 +237,30 @@ export function showShareReward(
     });
   } catch (error) {
     console.error("[contactsViral] 실행 중 에러:", error);
+    onError?.(error);
+  }
+}
+
+// ────────────────────────────────────────────────────────────
+// OG 이미지 포함 외부 공유 — getTossShareLink + share
+// 카카오·문자 등 외부 메신저에서 OG 미리보기가 표시됨
+// ────────────────────────────────────────────────────────────
+
+/**
+ * OG 이미지가 붙은 토스 공유 링크를 만들고 네이티브 공유 시트를 열어요.
+ *
+ * @param path       딥링크 경로 (기본값: 'intoss://business-quiz')
+ * @param onError    링크 생성 또는 공유 실패 시 호출
+ */
+export async function shareWithOG(
+  path: string = "intoss://business-quiz",
+  onError?: (error: unknown) => void
+): Promise<void> {
+  try {
+    const tossLink = await getTossShareLink(path, OG_IMAGE_URL);
+    await share({ message: tossLink });
+  } catch (error) {
+    console.error("[shareWithOG] 공유 실패:", error);
     onError?.(error);
   }
 }
