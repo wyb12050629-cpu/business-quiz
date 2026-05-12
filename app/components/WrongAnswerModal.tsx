@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { showRewardedAd, showShareReward } from "@/lib/toss-sdk";
+import { showRewardedAd, showShareReward, CHANCE_MODULE_ID } from "@/lib/toss-sdk";
 
 interface WrongAnswerModalProps {
   onRetry: () => void;
@@ -62,7 +62,8 @@ export default function WrongAnswerModal({
       () => {
         setMessage("공유 중 오류가 발생했어요. 다시 시도해 주세요.");
         setState("idle");
-      }
+      },
+      CHANCE_MODULE_ID   // 오답 재도전 전용 모듈
     );
   }
 

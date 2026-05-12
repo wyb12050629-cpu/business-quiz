@@ -26,8 +26,11 @@ export const AD_GROUP_IDS = {
   INTERSTITIAL: "ait-ad-test-interstitial-id",
 } as const;
 
-/** 콘솔 > 공유 리워드에서 발급받은 moduleId */
+/** 결과 페이지 공유 → 스탬프 5개 지급 */
 export const SHARE_MODULE_ID = "d4fd7b9c-6647-418f-ab22-f32953786e5f";
+
+/** 오답 시 공유 → 재도전 기회 1회 지급 */
+export const CHANCE_MODULE_ID = "61da5ee5-11e8-4db3-8e4e-69387cbc0895";
 
 // ────────────────────────────────────────────────────────────
 // 안전한 isSupported 헬퍼 (토스앱 외부 환경에서 에러 방지)
@@ -202,11 +205,12 @@ export interface ShareRewardResult {
 export function showShareReward(
   onReward: (result: ShareRewardResult) => void,
   onClose?: (reason: "clickBackButton" | "noReward", sentCount: number) => void,
-  onError?: (error: unknown) => void
+  onError?: (error: unknown) => void,
+  moduleId: string = SHARE_MODULE_ID
 ): void {
   try {
     const cleanup = contactsViral({
-      options: { moduleId: SHARE_MODULE_ID },
+      options: { moduleId },
       onEvent: (event) => {
         if (event.type === "sendViral") {
           // 친구 1명 공유 완료 → 리워드 지급
