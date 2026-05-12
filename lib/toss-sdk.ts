@@ -27,7 +27,7 @@ export const AD_GROUP_IDS = {
 } as const;
 
 /** 콘솔 > 공유 리워드에서 발급받은 moduleId ✏️ */
-export const SHARE_MODULE_ID = "YOUR_MODULE_ID";
+export const SHARE_MODULE_ID = "61da5ee5-11e8-4db3-8e4e-69387cbc0895";
 
 // ────────────────────────────────────────────────────────────
 // 안전한 isSupported 헬퍼 (토스앱 외부 환경에서 에러 방지)
