@@ -8,16 +8,15 @@ import { showShareReward } from "@/lib/toss-sdk";
 
 export default function ResultPage() {
   const router = useRouter();
-  const { todayStatus, progress, streak, totalPoints, sessionPoints, score, hydrated } = useGameState();
+  const { todayStatus, progress, streak, totalPoints, sessionPoints, score } = useGameState();
 
   useEffect(() => {
-    if (!hydrated) return;
     if (todayStatus === "not_started" || todayStatus === "in_progress") {
       router.replace("/");
     }
-  }, [hydrated, todayStatus, router]);
+  }, [todayStatus, router]);
 
-  if (!hydrated || todayStatus === "not_started" || todayStatus === "in_progress") {
+  if (todayStatus === "not_started" || todayStatus === "in_progress") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />

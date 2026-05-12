@@ -15,7 +15,6 @@ export default function QuizPage() {
   const router = useRouter();
   const {
     todayStatus,
-    hydrated,
     handleCorrect,
     handleFailure,
     currentQuestion,
@@ -31,11 +30,10 @@ export default function QuizPage() {
 
   // 완료 시 결과로 이동
   useEffect(() => {
-    if (!hydrated) return;
     if (todayStatus === "success" || todayStatus === "failure") {
       router.replace("/result");
     }
-  }, [todayStatus, hydrated, router]);
+  }, [todayStatus, router]);
 
   // 문제 바뀔 때 초기화
   useEffect(() => {
@@ -44,7 +42,7 @@ export default function QuizPage() {
     setShowModal(false);
   }, [currentStepIndex]);
 
-  if (!hydrated || !currentQuestion) {
+  if (!currentQuestion) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />

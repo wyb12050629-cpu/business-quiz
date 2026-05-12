@@ -6,15 +6,7 @@ import { MAX_POINTS } from "@/lib/quiz-data";
 
 export default function PointsPage() {
   const router = useRouter();
-  const { totalPoints, streak, hydrated } = useGameState();
-
-  if (!hydrated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  const { totalPoints, streak } = useGameState();
 
   // 오늘 최대 획득 가능 포인트 대비 퍼센트
   const completionRate = Math.min(100, Math.round((totalPoints / (MAX_POINTS * 5)) * 100));
