@@ -185,7 +185,7 @@ function TodayChallengeCard({
               <p className="font-bold text-base text-gray-900">
                 {new Date().toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit" }).replace(/\. /g, "-").replace(".", "")} {totalQuestions}문제 도전
               </p>
-              <p className="text-sm text-gray-400">직장인 상식을 테스트해 보세요!</p>
+              <p className="text-sm text-gray-400">직장인 상식 퀴즈를 풀고 스탬프를 받아요</p>
             </div>
           </div>
           <button onClick={onStart} className="btn-primary">도전 시작하기</button>
