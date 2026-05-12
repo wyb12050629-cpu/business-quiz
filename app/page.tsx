@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState, TodayStatus } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
 import PointBadge from "@/app/components/PointBadge";
 import RankCard from "@/app/components/RankCard";
 import { showRewardedAd } from "@/lib/toss-sdk";
+
+const NAME_KEY = "quiz_user_name";
 
 export default function HomePage() {
   const router = useRouter();
@@ -24,6 +26,24 @@ export default function HomePage() {
   } = useGameState();
 
   const [adState, setAdState] = useState<"idle" | "loading" | "done">("idle");
+  const [userName, setUserName] = useState("");
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+
+  // localStorage에서 이름 로드
+  useEffect(() => {
+    const saved = localStorage.getItem(NAME_KEY) ?? "";
+    setUserName(saved);
+    setNameInput(saved);
+    if (!saved) setEditingName(true); // 처음이면 바로 입력 모드
+  }, []);
+
+  function handleSaveName() {
+    const trimmed = nameInput.trim();
+    setUserName(trimmed);
+    localStorage.setItem(NAME_KEY, trimmed);
+    setEditingName(false);
+  }
 
   async function handleStart() {
     await startQuiz();
@@ -61,8 +81,8 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* 스트릭 카드 */}
-      {streak.count > 0 && <StreakCard count={streak.count} />}
+      {/* 스트릭 카드 — 항상 표시 */}
+      <StreakCard count={streak.count} maxStreak={streak.maxStreak} />
 
       {/* 오늘 도전 상태 카드 */}
       <TodayChallengeCard
@@ -76,23 +96,44 @@ export default function HomePage() {
         onContinue={() => router.push("/quiz")}
       />
 
-      {/* 안내 */}
-      <div className="rounded-2xl p-4 bg-gray-100">
-        <p className="text-sm font-semibold mb-1 text-gray-900">
-          💡 이렇게 진행돼요
-        </p>
-        <ul className="text-xs space-y-1 text-slate-600">
-          <li>• 매일 3문제, 문제당 최대 15스탬프</li>
-          <li>• 틀리면 광고 보기 or 친구 공유로 재도전 가능</li>
-          <li>• 매일 출석하면 7일마다 추가 10스탬프 🔥</li>
-        </ul>
-      </div>
-
-      {/* 내 직급 (RankCard + 광고 버튼) */}
+      {/* 내 직급 (이름 입력 + RankCard) */}
       <div>
-        <p className="text-xs font-semibold mb-2 text-gray-400">내 직급</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-gray-400">내 직급</p>
+          {!editingName && (
+            <button
+              onClick={() => { setNameInput(userName); setEditingName(true); }}
+              className="text-xs text-blue-400 active:scale-95 transition-all"
+            >
+              ✏️ 이름 변경
+            </button>
+          )}
+        </div>
+
+        {/* 이름 입력 필드 */}
+        {editingName && (
+          <div className="flex gap-2 mb-3">
+            <input
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              placeholder="이름을 입력하세요"
+              maxLength={10}
+              className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-400 bg-white"
+              autoFocus
+            />
+            <button
+              onClick={handleSaveName}
+              className="px-4 py-2 rounded-xl bg-blue-500 text-white text-sm font-semibold active:scale-95 transition-all"
+            >
+              확인
+            </button>
+          </div>
+        )}
+
         <RankCard
           totalStamps={totalPoints}
+          userName={userName}
           onWatchAd={handleStampAd}
           adState={adState}
         />

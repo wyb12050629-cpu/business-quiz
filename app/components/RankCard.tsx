@@ -5,11 +5,12 @@ import { getRankProgress } from "@/lib/ranks";
 
 interface RankCardProps {
   totalStamps: number;
+  userName?: string;
   onWatchAd?: () => void;
   adState?: "idle" | "loading" | "done";
 }
 
-export default function RankCard({ totalStamps, onWatchAd, adState = "idle" }: RankCardProps) {
+export default function RankCard({ totalStamps, userName, onWatchAd, adState = "idle" }: RankCardProps) {
   const { current, next, progress, stampsToNext } = getRankProgress(totalStamps);
 
   return (
@@ -39,7 +40,7 @@ export default function RankCard({ totalStamps, onWatchAd, adState = "idle" }: R
       {/* 직급 배지 */}
       <div className="flex items-center gap-2 mb-3">
         <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${current.badgeBg} ${current.badgeText}`}>
-          {current.emoji} {current.title}
+          {current.emoji} {userName ? `${userName} ${current.title}` : current.title}
         </span>
         <span className="text-xs text-gray-400">💼 {totalStamps.toLocaleString()} 스탬프</span>
       </div>

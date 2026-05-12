@@ -120,7 +120,7 @@ export default function ResultPage() {
       {/* 성공: 스트릭 */}
       {isSuccess && streak.count > 0 && (
         <div className="mb-4">
-          <StreakCard count={streak.count} />
+          <StreakCard count={streak.count} maxStreak={streak.maxStreak} />
         </div>
       )}
 

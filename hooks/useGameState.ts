@@ -21,6 +21,7 @@ export type TodayStatus = "not_started" | "in_progress" | "success" | "failure";
 
 export interface StreakData {
   count: number;
+  maxStreak: number;
   lastSuccessDate: string;
 }
 
@@ -109,6 +110,7 @@ export function useGameState() {
 
   const streak: StreakData = {
     count: userPoints?.streak ?? 0,
+    maxStreak: userPoints?.maxStreak ?? 0,
     lastSuccessDate: userPoints?.lastSuccessDate ?? "",
   };
 
