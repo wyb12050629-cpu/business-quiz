@@ -50,31 +50,56 @@ export function useGameState() {
 
   // ── 초기 로드 ────────────────────────────────
   useEffect(() => {
-    if (authLoading || !userId) return;
+    // 인증 완료 대기
+    if (authLoading) return;
+
+    // 인증이 완료됐지만 userId가 없으면 (극히 드문 경우) 로딩만 해제
+    if (!userId) {
+      setHydrated(true);
+      return;
+    }
+
+    // Firestore 무응답 대비 안전 타임아웃 (8초)
+    const abortController = new AbortController();
+    const safetyTimer = setTimeout(() => {
+      abortController.abort();
+      console.warn("[useGameState] Firestore 응답 없음 — 타임아웃으로 로딩 해제");
+      setHydrated(true);
+    }, 8000);
 
     async function load() {
       try {
         // 1. 오늘 문제 로드 (Firestore → 없으면 로컬 데이터)
         const todayQDoc = await getTodayQuestion();
-        if (todayQDoc && todayQDoc.questions.length > 0) {
+        if (!abortController.signal.aborted && todayQDoc && todayQDoc.questions.length > 0) {
           setQuestions(todayQDoc.questions.map(firestoreToLocal));
         }
 
+        if (abortController.signal.aborted) return;
+
         // 2. 오늘 진행 상황 로드
         const prog = await getDailyProgress(userId as string);
-        setProgress(prog);
+        if (!abortController.signal.aborted) setProgress(prog);
+
+        if (abortController.signal.aborted) return;
 
         // 3. 유저 포인트/스트릭 로드
         const pts = await getUserPoints(userId as string);
-        setUserPoints(pts);
+        if (!abortController.signal.aborted) setUserPoints(pts);
       } catch (err) {
         console.error("[useGameState] 로드 실패:", err);
       } finally {
-        setHydrated(true);
+        clearTimeout(safetyTimer);
+        if (!abortController.signal.aborted) setHydrated(true);
       }
     }
 
     load();
+
+    return () => {
+      abortController.abort();
+      clearTimeout(safetyTimer);
+    };
   }, [userId, authLoading]);
 
   // ── 파생 상태 ────────────────────────────────

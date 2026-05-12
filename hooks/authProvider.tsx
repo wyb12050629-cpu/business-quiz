@@ -21,7 +21,7 @@ const LS_KEY = "quiz_uid";
 async function getTossUserId(): Promise<string | null> {
   // 타임아웃을 import 전에 시작 — 토스앱 외부 환경 무한 대기 방지
   const timeout = new Promise<null>((resolve) =>
-    setTimeout(() => resolve(null), 1500)
+    setTimeout(() => resolve(null), 3000)
   );
 
   const keyPromise = import("@apps-in-toss/web-framework")
@@ -102,6 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           } catch (error) {
             console.error("[Auth] Firebase 익명 로그인 실패:", error);
+            // Toss SDK, Firebase 모두 실패 → 로컬 UUID 폴백 (앱이 멈추지 않도록)
+            if (!cancelled) {
+              const existing = localStorage.getItem(LS_KEY);
+              const fallbackId =
+                existing ||
+                `local_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+              localStorage.setItem(LS_KEY, fallbackId);
+              setUserId(fallbackId);
+              setAuthSource("firebase");
+            }
           } finally {
             if (!cancelled) setLoading(false);
           }
