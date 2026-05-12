@@ -19,18 +19,21 @@ const MINI_APP_CATEGORY: "game" | "non-game" = "non-game";
 const LS_KEY = "quiz_uid";
 
 async function getTossUserId(): Promise<string | null> {
-  try {
-    const sdk = await import("@apps-in-toss/web-framework");
-    if (MINI_APP_CATEGORY === "game") {
-      const key = await sdk.getUserKeyForGame();
-      return key ?? null;
-    } else {
-      const key = await sdk.getAnonymousKey();
-      return key ?? null;
-    }
-  } catch {
-    return null;
-  }
+  // 타임아웃을 import 전에 시작 — 토스앱 외부 환경 무한 대기 방지
+  const timeout = new Promise<null>((resolve) =>
+    setTimeout(() => resolve(null), 1500)
+  );
+
+  const keyPromise = import("@apps-in-toss/web-framework")
+    .then((sdk) =>
+      MINI_APP_CATEGORY === "game"
+        ? sdk.getUserKeyForGame()
+        : sdk.getAnonymousKey()
+    )
+    .then((key) => key ?? null)
+    .catch(() => null);
+
+  return Promise.race([keyPromise, timeout]);
 }
 
 interface AuthContextType {

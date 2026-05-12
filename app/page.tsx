@@ -64,7 +64,7 @@ export default function HomePage() {
       />
 
       {/* 안내 */}
-      <div className="rounded-2xl p-4 mt-auto" style={{ backgroundColor: "#f2f4f6" }}>
+      <div className="rounded-2xl p-4" style={{ backgroundColor: "#f2f4f6" }}>
         <p className="text-sm font-semibold mb-1" style={{ color: "#191f28" }}>
           💡 이렇게 진행돼요
         </p>
@@ -73,6 +73,15 @@ export default function HomePage() {
           <li>• 틀리면 광고 보기 or 친구 공유로 재도전 가능</li>
           <li>• 매일 완료하면 스트릭이 쌓여요 🔥</li>
         </ul>
+      </div>
+
+      {/* 면책 문구 */}
+      <div className="mt-auto pt-2 pb-1">
+        <p className="text-center text-xs leading-relaxed" style={{ color: "#b0b8c1" }}>
+          본 퀴즈는 학습 참고용 서비스입니다.{"\n"}
+          내용에 오류가 있을 수 있으며, 법적 상담·조언·해석의{"\n"}
+          근거로 사용할 수 없습니다.
+        </p>
       </div>
     </div>
   );

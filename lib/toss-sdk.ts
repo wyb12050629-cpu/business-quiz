@@ -30,11 +30,22 @@ export const AD_GROUP_IDS = {
 export const SHARE_MODULE_ID = "YOUR_MODULE_ID";
 
 // ────────────────────────────────────────────────────────────
+// 안전한 isSupported 헬퍼 (토스앱 외부 환경에서 에러 방지)
+// ────────────────────────────────────────────────────────────
+function safeIsSupported(fn: { isSupported: () => boolean }): boolean {
+  try {
+    return fn.isSupported();
+  } catch {
+    return false;
+  }
+}
+
+// ────────────────────────────────────────────────────────────
 // 배너 광고 SDK 초기화
 // app/layout.tsx 또는 최상위 컴포넌트에서 한 번만 호출
 // ────────────────────────────────────────────────────────────
 export function initTossAds(onReady?: () => void): void {
-  if (!TossAds.initialize.isSupported()) {
+  if (!safeIsSupported(TossAds.initialize)) {
     console.warn("[TossAds] 이 환경에서는 배너 광고를 사용할 수 없어요 (토스앱 5.241+ 필요)");
     return;
   }
@@ -59,7 +70,7 @@ export function attachBannerAd(
   container: HTMLElement,
   onImpression?: () => void
 ): (() => void) | undefined {
-  if (!TossAds.attachBanner.isSupported()) {
+  if (!safeIsSupported(TossAds.attachBanner)) {
     console.warn("[TossAds] attachBanner 미지원 환경");
     return undefined;
   }
@@ -92,7 +103,7 @@ let unregisterLoad: (() => void) | null = null;
 
 /** 리워드 광고 미리 로드 (퀴즈 화면 진입 시 호출 권장) */
 export function preloadRewardedAd(): () => void {
-  if (!loadFullScreenAd.isSupported()) {
+  if (!safeIsSupported(loadFullScreenAd)) {
     console.warn("[FullScreenAd] 미지원 환경 (토스앱 5.247+ 필요)");
     return () => {};
   }
@@ -126,7 +137,7 @@ export function showRewardedAd(
   onFailed?: () => void
 ): void {
   // 개발 환경 / 미지원 환경 fallback
-  if (!showFullScreenAd.isSupported()) {
+  if (!safeIsSupported(showFullScreenAd)) {
     console.warn("[FullScreenAd] 미지원 환경 — 개발 fallback: 리워드 즉시 지급");
     onRewarded("기회", 1);
     return;
