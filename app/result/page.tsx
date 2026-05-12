@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
+import { showShareReward, SHARE_MODULE_ID } from "@/lib/toss-sdk";
 import { getRankByCoins } from "@/lib/ranks";
 
 export default function ResultPage() {
@@ -118,6 +119,15 @@ export default function ResultPage() {
   // ── 결과 표시 ────────────────────────────────────────
   const isSuccess = todayStatus === "success";
 
+  function handleShare() {
+    showShareReward(
+      () => { /* 리워드 지급은 toss-sdk 내부에서 처리 */ },
+      undefined,
+      undefined,
+      SHARE_MODULE_ID,
+    );
+  }
+
   // 직급 승진 감지
   const prevCoins = Math.max(0, totalPoints - sessionPoints);
   const currentRank = getRankByCoins(totalPoints);
@@ -207,6 +217,13 @@ export default function ResultPage() {
 
       {/* 버튼 */}
       <div className="mt-auto space-y-3">
+        <button
+          onClick={handleShare}
+          className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
+        >
+          <span>🔗</span>
+          <span>친구에게 결과 공유하고 5스탬프 받기</span>
+        </button>
         <button
           onClick={() => router.push("/points")}
           className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
