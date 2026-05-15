@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
+import BannerAd from "@/app/components/BannerAd";
 import { shareWithOG } from "@/lib/toss-sdk";
 import { getRankByCoins } from "@/lib/ranks";
 
@@ -130,7 +131,7 @@ export default function ResultPage() {
   const isRankUp = isSuccess && currentRank.title !== prevRank.title;
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pt-14 pb-10">
+    <div className="flex flex-col px-5 pt-14 pb-10">
       {/* 직급 승진 배너 */}
       {isRankUp && (
         <div className="rounded-2xl p-4 mb-4 text-center bg-yellow-50 border border-yellow-200">
@@ -233,6 +234,9 @@ export default function ResultPage() {
           홈으로 돌아가기
         </button>
       </div>
+
+      {/* 피드형 광고 — 버튼 아래, 스크롤해야 보임 */}
+      <BannerAd variant="expanded" />
     </div>
   );
 }

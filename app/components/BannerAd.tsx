@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { TossAds } from "@apps-in-toss/web-framework";
 import { AD_GROUP_IDS } from "@/lib/toss-sdk";
 
-export default function BannerAd() {
+interface BannerAdProps {
+  variant?: "card" | "expanded";
+}
+
+export default function BannerAd({ variant = "card" }: BannerAdProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -40,7 +44,7 @@ export default function BannerAd() {
       const result = TossAds.attachBanner(AD_GROUP_IDS.BANNER, container, {
         theme: "auto",
         tone: "blackAndWhite",
-        variant: "card",
+        variant,
         callbacks: {
           onAdRendered: (p) => console.debug("[Banner] 렌더링 완료:", p.slotId),
           onAdViewable: (p) => console.debug("[Banner] 노출 기록 (수익 발생):", p.slotId),
@@ -63,7 +67,7 @@ export default function BannerAd() {
 
   return (
     <div
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white z-40"
+      className="w-full mt-2"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {/* height 고정 금지 — 광고 콘텐츠 높이에 맞게 자동 조절 */}

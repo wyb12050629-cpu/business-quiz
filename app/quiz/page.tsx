@@ -6,7 +6,6 @@ import { useGameState } from "@/hooks/useGameState";
 import StepIndicator from "@/app/components/StepIndicator";
 import ExplanationCard from "@/app/components/ExplanationCard";
 import WrongAnswerModal from "@/app/components/WrongAnswerModal";
-import BannerAd from "@/app/components/BannerAd";
 import { preloadRewardedAd } from "@/lib/toss-sdk";
 
 type AnswerState = "unanswered" | "correct" | "wrong";
@@ -107,7 +106,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-28">
+    <div className="flex flex-col min-h-screen">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
         {/* 모달 열려있을 때 뒤로가기 = 포기 */}
@@ -187,8 +186,6 @@ export default function QuizPage() {
           />
         )}
       </div>
-
-      <BannerAd />
 
       {showModal && (
         <WrongAnswerModal
