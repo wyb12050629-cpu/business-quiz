@@ -40,7 +40,7 @@ export default function BannerAd() {
       const result = TossAds.attachBanner(AD_GROUP_IDS.BANNER, container, {
         theme: "auto",
         tone: "blackAndWhite",
-        variant: "expanded",
+        variant: "card",
         callbacks: {
           onAdRendered: (p) => console.debug("[Banner] 렌더링 완료:", p.slotId),
           onAdViewable: (p) => console.debug("[Banner] 노출 기록 (수익 발생):", p.slotId),

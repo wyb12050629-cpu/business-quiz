@@ -20,6 +20,7 @@ export default function QuizPage() {
     questions,
     totalQuestions,
     currentStepIndex, // Firestore 기준 초기 스텝 (초기화 용도)
+    progress,         // null = Firestore 아직 로드 중
   } = useGameState();
 
   // ── 로컬 스텝: Firestore 타이밍과 완전히 분리 ──────────
@@ -33,12 +34,14 @@ export default function QuizPage() {
 
   useEffect(() => { preloadRewardedAd(); }, []);
 
-  // Firestore 초기값으로 localStep 한 번만 초기화 (progress 로드 후)
+  // Firestore progress가 실제로 로드된 후에만 localStep 초기화
+  // progress === null 일 때 초기화하면 currentStepIndex=0으로 설정되어
+  // 이미 푼 문제를 처음부터 다시 보는 버그 발생
   useEffect(() => {
-    if (localStep === null) {
+    if (progress !== null && localStep === null) {
       setLocalStep(currentStepIndex);
     }
-  }, [currentStepIndex, localStep]);
+  }, [progress, currentStepIndex, localStep]);
 
   // 완료(성공/실패) 시 결과로 이동 — handleCorrect 완료 후 Firestore 쓰기 보장
   useEffect(() => {
@@ -60,7 +63,8 @@ export default function QuizPage() {
   const currentQuestion = questions[clampedStep] ?? null;
   const isLastQuestion = shownStep >= totalQuestions - 1;
 
-  if (!currentQuestion) {
+  // progress 로드 전 or localStep 미초기화 → 스피너
+  if (progress === null || localStep === null || !currentQuestion) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />

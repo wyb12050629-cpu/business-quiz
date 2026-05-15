@@ -130,6 +130,12 @@ export async function saveStepResult(
 
   const progress = await getDailyProgress(userId);
 
+  // 이미 처리된 step이면 재저장 방지
+  // (뒤로가기 후 같은 문제 재풀기, 네트워크 중복 요청 등 방어)
+  if (progress.currentStep > step) {
+    return progress;
+  }
+
   const newStepResult: StepResult = {
     step,
     isCorrect,
