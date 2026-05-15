@@ -179,8 +179,8 @@ export function showRewardedAd(
           console.debug("[FullScreenAd] 광고 닫힘");
           onDismissed?.();
           unregister();
-          // 다음 광고 미리 로드
-          preloadRewardedAd();
+          // 다음 광고 미리 로드 (같은 adGroupId)
+          preloadRewardedAd(adGroupId);
           break;
         case "failedToShow":
           console.error("[FullScreenAd] 광고 표시 실패");

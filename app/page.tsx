@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useGameState, TodayStatus } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
@@ -26,6 +26,7 @@ export default function HomePage() {
   } = useGameState();
 
   const [adState, setAdState] = useState<"idle" | "loading" | "done">("idle");
+  const adDoneRef = useRef(false);
 
   // 홈 진입 시 스탬프 리워드 광고 미리 로드
   useEffect(() => { preloadRewardedAd(AD_GROUP_IDS.REWARDED_STAMP); }, []);
@@ -54,16 +55,18 @@ export default function HomePage() {
   }
 
   function handleStampAd() {
+    adDoneRef.current = false;
     setAdState("loading");
     showRewardedAd(
       async () => {
         // 리워드 획득 → 스탬프 50개 지급
+        adDoneRef.current = true;
         await addBonusStamps(50);
         setAdState("done");
       },
       () => {
-        // 광고 닫힘 (리워드 없음)
-        if (adState !== "done") setAdState("idle");
+        // 광고 닫힘 — ref로 확인해야 클로저 문제 방지
+        if (!adDoneRef.current) setAdState("idle");
       },
       () => {
         // 광고 실패
