@@ -7,6 +7,8 @@ interface WrongAnswerModalProps {
   onRetry: () => void;
   /** 기회 포기 — 오늘 도전 종료. 호출 시 Firestore에 isFailed=true 저장됨 */
   onGiveUp: () => void;
+  /** 남은 무료 재도전 기회 (0이면 광고/공유 필요) */
+  retriesLeft: number;
 }
 
 type ModalState = "idle" | "loading" | "done";
@@ -14,9 +16,14 @@ type ModalState = "idle" | "loading" | "done";
 export default function WrongAnswerModal({
   onRetry,
   onGiveUp,
+  retriesLeft,
 }: WrongAnswerModalProps) {
   const [state, setState] = useState<ModalState>("idle");
   const [message, setMessage] = useState("");
+
+  function handleFreeRetry() {
+    onRetry();
+  }
 
   function handleWatchAd() {
     setState("loading");
@@ -64,7 +71,7 @@ export default function WrongAnswerModal({
         setMessage("공유 중 오류가 발생했어요. 다시 시도해 주세요.");
         setState("idle");
       },
-      CHANCE_MODULE_ID   // 오답 재도전 전용 모듈
+      CHANCE_MODULE_ID
     );
   }
 
@@ -81,9 +88,17 @@ export default function WrongAnswerModal({
           <h2 className="text-xl font-bold mb-1 text-gray-900">
             아쉽게도 틀렸어요
           </h2>
-          <p className="text-sm text-slate-500">
-            광고를 보거나 친구에게 공유하면 다시 도전할 수 있어요
-          </p>
+          {retriesLeft > 0 ? (
+            <p className="text-sm text-slate-500">
+              오늘 남은 무료 재도전 기회가{" "}
+              <span className="font-bold text-blue-500">{retriesLeft}번</span>{" "}
+              있어요
+            </p>
+          ) : (
+            <p className="text-sm text-slate-500">
+              무료 기회를 모두 사용했어요. 광고를 보거나 친구에게 공유하면 다시 도전할 수 있어요
+            </p>
+          )}
         </div>
 
         {message && (
@@ -94,23 +109,37 @@ export default function WrongAnswerModal({
 
         {state === "idle" && (
           <div className="space-y-3">
-            <button
-              onClick={handleWatchAd}
-              className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
-            >
-              <span>📺</span>
-              <span>광고 보고 다시 도전</span>
-            </button>
+            {retriesLeft > 0 ? (
+              /* 무료 재도전 */
+              <button
+                onClick={handleFreeRetry}
+                className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
+              >
+                <span>🔄</span>
+                <span>다시 도전하기</span>
+              </button>
+            ) : (
+              /* 기회 소진 — 광고/공유 필요 */
+              <>
+                <button
+                  onClick={handleWatchAd}
+                  className="w-full py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-blue-500"
+                >
+                  <span>📺</span>
+                  <span>광고 보고 다시 도전</span>
+                </button>
 
-            <button
-              onClick={handleShare}
-              className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
-            >
-              <span>🔗</span>
-              <span>친구에게 공유하고 다시 도전</span>
-            </button>
+                <button
+                  onClick={handleShare}
+                  className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 active:scale-95 transition-all bg-gray-100 text-slate-600"
+                >
+                  <span>🔗</span>
+                  <span>친구에게 공유하고 다시 도전</span>
+                </button>
+              </>
+            )}
 
-            {/* 포기 버튼 — 오늘 도전 종료, 내일부터 다시 시작 */}
+            {/* 포기 버튼 — 오늘 도전 종료 */}
             <button
               onClick={onGiveUp}
               className="w-full py-3 text-sm font-medium active:scale-95 transition-all text-rose-400"

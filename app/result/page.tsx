@@ -186,7 +186,7 @@ export default function ResultPage() {
       <div className="card mb-4 flex items-center gap-3">
         <span className="text-3xl">{currentRank.emoji}</span>
         <div>
-          <p className="text-xs text-gray-400 mb-0.5">현재 직급</p>
+          <p className="text-xs text-gray-400 mb-0.5">프로필</p>
           <p className="font-bold text-base text-gray-900">{currentRank.title}</p>
         </div>
         <span className={`ml-auto text-xs font-bold px-2.5 py-1 rounded-full ${currentRank.badgeBg} ${currentRank.badgeText}`}>

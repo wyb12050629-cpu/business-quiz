@@ -6,9 +6,10 @@ import { AD_GROUP_IDS } from "@/lib/toss-sdk";
 
 interface BannerAdProps {
   variant?: "card" | "expanded";
+  adGroupId?: string;
 }
 
-export default function BannerAd({ variant = "card" }: BannerAdProps) {
+export default function BannerAd({ variant = "card", adGroupId = AD_GROUP_IDS.BANNER }: BannerAdProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -41,7 +42,7 @@ export default function BannerAd({ variant = "card" }: BannerAdProps) {
     if (!container) return;
     try {
       if (!TossAds.attachBanner.isSupported()) return;
-      const result = TossAds.attachBanner(AD_GROUP_IDS.BANNER, container, {
+      const result = TossAds.attachBanner(adGroupId, container, {
         theme: "auto",
         tone: "blackAndWhite",
         variant,
@@ -57,7 +58,7 @@ export default function BannerAd({ variant = "card" }: BannerAdProps) {
     } catch {
       // 에러 무시
     }
-  }, []);
+  }, [adGroupId, variant]);
 
   useEffect(() => {
     if (!isInitialized) return;

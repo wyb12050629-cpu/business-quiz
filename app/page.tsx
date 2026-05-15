@@ -6,7 +6,7 @@ import { useGameState, TodayStatus } from "@/hooks/useGameState";
 import StreakCard from "@/app/components/StreakCard";
 import PointBadge from "@/app/components/PointBadge";
 import RankCard from "@/app/components/RankCard";
-import { showRewardedAd, AD_GROUP_IDS } from "@/lib/toss-sdk";
+import { showRewardedAd, preloadRewardedAd, AD_GROUP_IDS } from "@/lib/toss-sdk";
 
 const NAME_KEY = "quiz_user_name";
 
@@ -26,6 +26,9 @@ export default function HomePage() {
   } = useGameState();
 
   const [adState, setAdState] = useState<"idle" | "loading" | "done">("idle");
+
+  // 홈 진입 시 스탬프 리워드 광고 미리 로드
+  useEffect(() => { preloadRewardedAd(AD_GROUP_IDS.REWARDED_STAMP); }, []);
   const [userName, setUserName] = useState("");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -97,10 +100,10 @@ export default function HomePage() {
         onContinue={() => router.push("/quiz")}
       />
 
-      {/* 내 직급 (이름 입력 + RankCard) */}
+      {/* 프로필 (이름 입력 + RankCard) */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-gray-400">내 직급</p>
+          <p className="text-xs font-semibold text-gray-400">프로필</p>
           {!editingName && (
             <button
               onClick={() => { setNameInput(userName); setEditingName(true); }}

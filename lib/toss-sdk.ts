@@ -23,9 +23,10 @@ import {
 // 광고 그룹 ID 상수
 // ────────────────────────────────────────────────────────────
 export const AD_GROUP_IDS = {
-  BANNER: "ait.v2.live.7dcbc970fbd64914",
-  REWARDED_STAMP: "ait.v2.live.7ead2ae75a32496c",  // 홈 — 광고 보고 스탬프 50개
-  REWARDED_RETRY: "ait.v2.live.0e829aaf49e54308",  // 오답 — 광고 보고 다시 도전
+  BANNER: "ait.v2.live.7dcbc970fbd64914",           // 결과 페이지 — 피드형(expanded)
+  BANNER_QUIZ: "ait.v2.live.68914c5d2b60450f",       // 퀴즈 화면 — 리스트형(card)
+  REWARDED_STAMP: "ait.v2.live.7ead2ae75a32496c",    // 홈 — 빠른승진 광고 보고 스탬프 50개
+  REWARDED_RETRY: "ait.v2.live.0e829aaf49e54308",    // 오답 — 광고 보고 퀴즈 재도전
   INTERSTITIAL: "ait-ad-test-interstitial-id",
 } as const;
 

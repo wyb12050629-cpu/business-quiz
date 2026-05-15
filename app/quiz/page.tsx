@@ -6,7 +6,8 @@ import { useGameState } from "@/hooks/useGameState";
 import StepIndicator from "@/app/components/StepIndicator";
 import ExplanationCard from "@/app/components/ExplanationCard";
 import WrongAnswerModal from "@/app/components/WrongAnswerModal";
-import { preloadRewardedAd } from "@/lib/toss-sdk";
+import { preloadRewardedAd, AD_GROUP_IDS } from "@/lib/toss-sdk";
+import BannerAd from "@/app/components/BannerAd";
 
 type AnswerState = "unanswered" | "correct" | "wrong";
 
@@ -28,6 +29,8 @@ export default function QuizPage() {
   const [answerState, setAnswerState] = useState<AnswerState>("unanswered");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  // 하루 무료 재도전 기회: 최대 3번. 틀릴 때마다 1 감소, 0이 되면 광고/공유 필요
+  const [freeRetries, setFreeRetries] = useState(3);
   // 마지막 문제 정답 후 Firestore 저장 대기 중 오버레이
   const [awaitingResult, setAwaitingResult] = useState(false);
 
@@ -79,6 +82,7 @@ export default function QuizPage() {
       handleCorrect(currentQuestion!.points);
     } else {
       setAnswerState("wrong");
+      setFreeRetries((prev) => Math.max(0, prev - 1)); // 무료 기회 1 차감
       setShowModal(true);
     }
   }
@@ -192,7 +196,13 @@ export default function QuizPage() {
         <WrongAnswerModal
           onRetry={handleRetry}
           onGiveUp={handleGiveUp}
+          retriesLeft={freeRetries}
         />
+      )}
+
+      {/* 퀴즈 하단 배너 광고 (리스트형) */}
+      {answerState === "unanswered" && !showModal && (
+        <BannerAd variant="card" adGroupId={AD_GROUP_IDS.BANNER_QUIZ} />
       )}
 
       {/* 마지막 문제 저장 대기 오버레이 */}
