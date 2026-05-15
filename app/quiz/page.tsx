@@ -137,7 +137,8 @@ export default function QuizPage() {
           {currentQuestion.options.map((option, index) => {
             const isSelected = selectedIndex === index;
             const isCorrectOption = index === currentQuestion.answer;
-            const revealed = answerState !== "unanswered";
+            // 모달이 열려있을 때는 정답 표시 안 함
+            const revealed = answerState !== "unanswered" && !showModal;
 
             const btnClass = [
               "w-full text-left px-4 py-4 rounded-2xl border-2 font-medium text-sm transition-all active:scale-95",
