@@ -144,7 +144,7 @@ export default function ResultPage() {
       )}
 
       {/* 이모지 & 타이틀 */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <div className="text-6xl mb-4 animate-bounce">{isSuccess ? "🎉" : "😢"}</div>
         <h1 className="text-2xl font-bold mb-2 text-gray-900">
           {isSuccess ? "퀴즈 완료!" : "오늘은 여기까지!"}
